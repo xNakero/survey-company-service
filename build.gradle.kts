@@ -41,6 +41,8 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1")
+    testImplementation("com.github.tomakehurst:wiremock:2.27.2")
 
 }
 
