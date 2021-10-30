@@ -30,6 +30,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.auth0:java-jwt:3.18.2")
+    implementation("com.h2database:h2:1.4.200")
 
     runtimeOnly("org.postgresql:postgresql")
 
@@ -40,9 +42,9 @@ dependencies {
     testImplementation("org.testcontainers:mongodb")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0")
+    testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1")
-    testImplementation("com.github.tomakehurst:wiremock:2.27.2")
 
 }
 

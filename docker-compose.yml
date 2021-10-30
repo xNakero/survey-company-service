@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14.0
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=survey-app
+      - POSTGRES_PASSWORD=pass1234

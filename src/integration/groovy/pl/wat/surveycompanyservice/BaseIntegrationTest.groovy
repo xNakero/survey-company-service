@@ -1,6 +1,6 @@
 package pl.wat.surveycompanyservice
 
-import groovyx.net.http.HttpResponseDecorator
+
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
