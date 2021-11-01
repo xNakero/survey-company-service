@@ -1,7 +1,11 @@
 package pl.wat.surveycompanyservice.api
 
 import com.auth0.jwt.exceptions.JWTVerificationException
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.CONFLICT
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -14,30 +18,52 @@ class ExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException::class)
     @ResponseStatus(CONFLICT)
-    fun conflictResponseExceptionHandler(exception: RuntimeException) =
+    fun userAlreadyExistsExceptionHandler(exception: UserAlreadyExistsException) =
         AppException(
-            statusCode = CONFLICT.toString(),
-            message = exception.message
+            httpStatus = CONFLICT,
+            statusCode = CONFLICT.value(),
+            errors = listOf(exception.message)
         )
 
-    @ExceptionHandler(RoleNotFoundException::class, JWTVerificationException::class)
+    @ExceptionHandler(RoleNotFoundException::class)
     @ResponseStatus(BAD_REQUEST)
-    fun badRequestResponseExceptionHandler(exception: RuntimeException) =
+    fun roleNotFoundExceptionHandler(exception: RoleNotFoundException) =
         AppException(
-            statusCode = BAD_REQUEST.toString(),
-            message = exception.message
+            httpStatus = BAD_REQUEST,
+            statusCode = BAD_REQUEST.value(),
+            errors = listOf(exception.message)
+        )
+
+    @ExceptionHandler(JWTVerificationException::class)
+    @ResponseStatus(BAD_REQUEST)
+    fun jwtVerificationExceptionHandler(exception: JWTVerificationException) =
+        AppException(
+            httpStatus = BAD_REQUEST,
+            statusCode = BAD_REQUEST.value(),
+            errors = listOf(exception.message)
         )
 
     @ExceptionHandler(AuthenticationException::class)
     @ResponseStatus(UNAUTHORIZED)
-    fun unauthorizedResponseExceptionHandler(exception: RuntimeException) =
+    fun authenticationExceptionHandler(exception: AuthenticationException) =
         AppException(
-            statusCode = UNAUTHORIZED.toString(),
-            message =  exception.message
+            httpStatus = UNAUTHORIZED,
+            statusCode = UNAUTHORIZED.value(),
+            errors = listOf(exception.message)
+        )
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(BAD_REQUEST)
+    fun methodArgumentNotValidExceptionHandler(exception: MethodArgumentNotValidException) =
+        AppException(
+            httpStatus = BAD_REQUEST,
+            statusCode = BAD_REQUEST.value(),
+            errors = exception.bindingResult.allErrors.map { it.defaultMessage }
         )
 }
 
 data class AppException(
-    val statusCode: String?,
-    val message: String?
+    val httpStatus: HttpStatus,
+    val statusCode: Int,
+    val errors: List<String?>
 )

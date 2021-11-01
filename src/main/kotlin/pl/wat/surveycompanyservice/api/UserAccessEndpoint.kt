@@ -1,14 +1,18 @@
 package pl.wat.surveycompanyservice.api
 
+import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import pl.wat.surveycompanyservice.domain.role.AppRole
-import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.domain.user.UserFacade
+import pl.wat.surveycompanyservice.infrastructure.validator.Enum
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 class UserAccessEndpoint(
@@ -22,7 +26,7 @@ class UserAccessEndpoint(
 
     @PostMapping("/register")
     @ResponseStatus(CREATED)
-    fun register(@RequestBody request: RegistrationRequest) =
+    fun register(@Valid @RequestBody request: RegistrationRequest) =
         userFacade.createUser(
             username = request.username,
             password = request.password,
@@ -36,14 +40,14 @@ class UserAccessEndpoint(
 }
 
 data class LoginRequest(
-    val username: String,
-    val password: String
+    @field:Email(message = "Invalid email") val username: String,
+    @field:Length(min = 8, max = 32, message = "Password has to be between 8 and 32 characters.") val password: String
 )
 
 data class RegistrationRequest(
-    val username: String,
-    val password: String,
-    val role: String
+    @field:Email(message = "Provided email is not an email.") val username: String,
+    @field:Length(min = 8, max = 32, message = "Password has to be between 8 and 32 characters.") val password: String,
+    @field:Enum(AppRole::class, message = "There is no such role") val role: String
 )
 
 
