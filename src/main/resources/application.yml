@@ -10,3 +10,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+  elasticsearch:
+    rest:
+      username:
+      password:
+      read-timeout: 1m
+      connection-timeout: 1s
+      uris: localhost:9200
+server:
+  port: 8080

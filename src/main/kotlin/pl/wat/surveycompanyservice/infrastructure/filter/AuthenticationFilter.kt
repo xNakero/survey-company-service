@@ -11,8 +11,7 @@ import javax.servlet.http.HttpServletResponse
 class AuthenticationFilter(
     authenticationManager: AuthenticationManager?,
     private val tokenService: TokenService
-) :
-    BasicAuthenticationFilter(authenticationManager) {
+) : BasicAuthenticationFilter(authenticationManager) {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val token = request.getHeader("Authorization").replace("Bearer ", "")

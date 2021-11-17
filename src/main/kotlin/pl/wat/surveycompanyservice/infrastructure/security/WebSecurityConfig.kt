@@ -1,4 +1,4 @@
-package pl.wat.surveycompanyservice.config
+package pl.wat.surveycompanyservice.infrastructure.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import pl.wat.surveycompanyservice.domain.role.AppRole.INTERVIEWEE
 import pl.wat.surveycompanyservice.infrastructure.filter.AuthenticationFilter
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
 
@@ -30,7 +31,10 @@ open class WebSecurityConfig(
             .cors().disable()
             .sessionManagement().sessionCreationPolicy(STATELESS)
             .and()
-            .authorizeRequests().antMatchers("/renew").authenticated()
+            .authorizeRequests()
+                .antMatchers("/renew").authenticated()
+                .antMatchers("/personal-profile").authenticated()
+                .antMatchers("/personal-profile", "/personal-profile/*").hasRole(INTERVIEWEE.toString())
             .and()
             .addFilter(AuthenticationFilter(authenticationManager(), tokenService))
     }

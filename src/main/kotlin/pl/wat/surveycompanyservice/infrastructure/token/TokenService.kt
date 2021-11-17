@@ -7,13 +7,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Service
+import pl.wat.surveycompanyservice.domain.user.UserServiceImpl
 import java.lang.System.currentTimeMillis
-import java.util.*
+import java.util.Date
+import java.util.Base64
 
 @Service
 class TokenService(
     private val tokenProperties: TokenProperties,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val userServiceImpl: UserServiceImpl
 ) {
 
     fun getToken(authentication: Authentication): String =
@@ -39,9 +42,9 @@ class TokenService(
             .withIssuer(tokenProperties.issuer)
             .build()
         val jwt = verifier.verify(token.trim())
-        val subject = jwt.subject
+        val user = userServiceImpl.loadUserByUsername(jwt.subject)
         val authorities = getAuthoritiesFromPayload(jwt.payload)
-        return UsernamePasswordAuthenticationToken(subject, null, authorities)
+        return UsernamePasswordAuthenticationToken(user, null, authorities)
     }
 
     private fun getSignAlgorithm(): Algorithm =

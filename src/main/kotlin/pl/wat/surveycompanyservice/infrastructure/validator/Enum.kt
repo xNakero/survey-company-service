@@ -24,5 +24,5 @@ class EnumConstraintValidator(
     }
 
     override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean =
-        enumValues.contains(value)
+        value?.let { enumValues.contains(it) } ?: true
 }
