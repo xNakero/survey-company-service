@@ -3,16 +3,11 @@ package pl.wat.surveycompanyservice.domain.user
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.role.RoleRepository
-import java.lang.RuntimeException
 
 @Service
 class UserService(
@@ -29,7 +24,7 @@ class UserService(
         return authentication
     }
 
-    fun createUser(username: String, password: String, role: AppRole) {
+    fun createUser(username: String, password: String, role: AppRole) : AppUser{
         val existingRole = roleRepository.findByName(role.toString()) ?: throw RoleNotFoundException("There is no role $role.")
         userRepository.findByUsername(username)?.let { throw UserAlreadyExistsException("User with username=$username already exists.") }
         val user = userRepository.save(
@@ -40,6 +35,7 @@ class UserService(
             ))
         existingRole.users.add(user)
         roleRepository.save(existingRole)
+        return user
     }
 
 }

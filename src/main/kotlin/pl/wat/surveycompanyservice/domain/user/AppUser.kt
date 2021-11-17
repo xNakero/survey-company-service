@@ -3,16 +3,21 @@ package pl.wat.surveycompanyservice.domain.user
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.role.Role
-import javax.persistence.*
 import javax.persistence.CascadeType.ALL
+import javax.persistence.Entity
 import javax.persistence.FetchType.EAGER
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.JoinTable
+import javax.persistence.ManyToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "app_user")
 class AppUser(
-    @Id @GeneratedValue private val userId: Long = 0L,
+    @Id @GeneratedValue val userId: Long = 0L,
     private val username: String,
     private val password: String,
     @ManyToMany(cascade = [ALL], fetch = EAGER)
