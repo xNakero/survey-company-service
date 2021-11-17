@@ -2,10 +2,14 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.elasticsearch.action.DocWriteResponse.Result
+import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.update.UpdateRequest
 import org.elasticsearch.client.RequestOptions.DEFAULT
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.common.xcontent.XContentType.JSON
+import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.search.SearchHit
+import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.Criteria
@@ -13,8 +17,10 @@ import org.springframework.data.elasticsearch.core.query.CriteriaQuery
 import org.springframework.stereotype.Component
 import pl.wat.surveycompanyservice.domain.profile.ElasticPersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
+import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileRepository
 import pl.wat.surveycompanyservice.shared.UserId
+import java.time.LocalDate
 
 @Component
 class ElasticPersonalProfileRepository(
@@ -29,7 +35,7 @@ class ElasticPersonalProfileRepository(
 
     override fun updateProfile(personalProfile: PersonalProfile): Result {
         val updateJson = personalProfile.mapToUpdates()
-        val updateRequest = UpdateRequest("personal_profile", personalProfile.userId.raw)
+        val updateRequest = UpdateRequest(INDEX, personalProfile.userId.raw)
             .doc(updateJson, JSON)
         val updateResponse = client.update(updateRequest, DEFAULT)
         return updateResponse.result
@@ -37,8 +43,42 @@ class ElasticPersonalProfileRepository(
 
     override fun getProfile(userId: UserId): PersonalProfile {
         val query = CriteriaQuery(Criteria(ID).`is`(userId.raw))
-        val hits = elasticsearchRestTemplate.search(query, ElasticPersonalProfile::class.java, IndexCoordinates.of("personal_profile"))
+        val hits = elasticsearchRestTemplate.search(query, ElasticPersonalProfile::class.java, IndexCoordinates.of(INDEX))
         return hits.getSearchHit(0).content.toPersonalProfile()
+    }
+
+    override fun findEligibleParticipantIds(queryParams: PersonalProfileQueryParams): List<String> {
+        val searchRequest = SearchRequest(INDEX)
+        val searchSourceBuilder = SearchSourceBuilder()
+        val boolQuery = QueryBuilders.boolQuery()
+
+        queryParams.olderOrEqualThan
+            ?.let { boolQuery.must(QueryBuilders.rangeQuery(DATE_OF_BIRTH).gte(LocalDate.now().minusYears(it.toLong()))) }
+        queryParams.youngerOrEqualThan
+            ?.let { boolQuery.must(QueryBuilders.rangeQuery(DATE_OF_BIRTH).lte(LocalDate.now().minusYears(it.toLong()))) }
+        queryParams.civilStatus?.let { boolQuery.must(QueryBuilders.matchQuery(CIVIL_STATUS, it)) }
+        queryParams.countryOfBirth?.let { boolQuery.must(QueryBuilders.matchQuery(COUNTRY_OF_BIRTH, it)) }
+        queryParams.nationality?.let { boolQuery.must(QueryBuilders.matchQuery(NATIONALITY, it)) }
+        queryParams.currentCountry?.let { boolQuery.must(QueryBuilders.matchQuery(CURRENT_COUNTRY, it)) }
+        queryParams.firstLanguage?.let { boolQuery.must(QueryBuilders.matchQuery(FIRST_LANGUAGE, it)) }
+        queryParams.highestEducationLevelAchieved
+            ?.let { boolQuery.must(QueryBuilders.matchQuery(HIGHEST_EDUCATION_LEVEL_ACHIEVED, it)) }
+        queryParams.isStudent?.let { boolQuery.must(QueryBuilders.matchQuery(IS_STUDENT, it)) }
+        queryParams.monthlyIncomeHigherOrEqualThan
+            ?.let { boolQuery.must(QueryBuilders.rangeQuery(MONTHLY_INCOME).gte(it)) }
+        queryParams.monthlyIncomeLesserOrEqualThan
+            ?.let { boolQuery.must(QueryBuilders.rangeQuery(MONTHLY_INCOME).lte(it)) }
+        queryParams.employmentStatus?.let { boolQuery.must(QueryBuilders.matchQuery(EMPLOYMENT_STATUS, it)) }
+        queryParams.formOfEmployment?.let { boolQuery.must(QueryBuilders.matchQuery(FORM_OF_EMPLOYMENT, it)) }
+        queryParams.industry?.let { boolQuery.must(QueryBuilders.matchQuery(INDUSTRY, it)) }
+        queryParams.politicalSide?.let { boolQuery.must(QueryBuilders.matchQuery(POLITICAL_SIDE, it)) }
+
+        searchSourceBuilder.query(boolQuery)
+
+        searchRequest.source(searchSourceBuilder)
+
+        val result = client.search(searchRequest, DEFAULT).hits
+        return result.map { it.toParticipantId() }
     }
 
     private fun PersonalProfile.mapToUpdates(): String {
@@ -60,6 +100,10 @@ class ElasticPersonalProfileRepository(
         return objectMapper.writeValueAsString(updates)
     }
 
+    private fun SearchHit.toParticipantId(): String =
+        objectMapper.readValue(this.sourceAsString, ElasticPersonalProfile::class.java).userId
+
+
     companion object {
         const val ID = "_id"
         const val DATE_OF_BIRTH = "dateOfBirth"
@@ -75,5 +119,6 @@ class ElasticPersonalProfileRepository(
         const val FORM_OF_EMPLOYMENT = "formOfEmployment"
         const val INDUSTRY = "industry"
         const val POLITICAL_SIDE = "politicalSide"
+        const val INDEX = "personal_profile"
     }
 }

@@ -9,6 +9,15 @@ services:
       - POSTGRES_USER=survey-app
       - POSTGRES_PASSWORD=pass1234
 
+  mongodb:
+    image: mongo:5.0.4
+    container_name: mongodb1
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=username
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
     container_name: es01

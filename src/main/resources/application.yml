@@ -18,5 +18,12 @@ spring:
       read-timeout: 1m
       connection-timeout: 1s
       uris: localhost:9200
+
+  data:
+    mongodb:
+      authentication-database: admin
+      username: username
+      password: password
+
 server:
   port: 8080
