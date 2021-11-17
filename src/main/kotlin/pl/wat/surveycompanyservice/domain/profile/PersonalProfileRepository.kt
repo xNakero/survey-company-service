@@ -7,4 +7,5 @@ interface PersonalProfileRepository {
     fun createEmptyProfile(personalProfile: PersonalProfile)
     fun updateProfile(personalProfile: PersonalProfile): Result
     fun getProfile(userId: UserId): PersonalProfile
+    fun findEligibleParticipantIds(queryParams: PersonalProfileQueryParams): List<String>
 }

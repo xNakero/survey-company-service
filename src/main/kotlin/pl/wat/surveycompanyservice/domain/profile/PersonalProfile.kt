@@ -4,15 +4,17 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
+import org.springframework.data.elasticsearch.annotations.FieldType.Date
 import org.springframework.data.elasticsearch.annotations.FieldType.Integer
 import org.springframework.data.elasticsearch.annotations.FieldType.Text
 import pl.wat.surveycompanyservice.shared.UserId
 import java.time.Instant
+import java.time.LocalDate
 
 
 data class PersonalProfile(
     val userId: UserId,
-    val dateOfBirth: Instant?,
+    val dateOfBirth: LocalDate?,
     val civilStatus: CivilStatus?,
     val countryOfBirth: Country?,
     val nationality: Country?,
@@ -29,7 +31,7 @@ data class PersonalProfile(
 
     fun toMongoPersonalProfile(): ElasticPersonalProfile = ElasticPersonalProfile(
         userId = userId.raw,
-        dateOfBirth = dateOfBirth.toString(),
+        dateOfBirth = dateOfBirth,
         civilStatus = civilStatus.toString(),
         countryOfBirth = countryOfBirth.toString(),
         nationality = nationality.toString(),
@@ -48,8 +50,8 @@ data class PersonalProfile(
 @Document(indexName = "personal_profile")
 data class ElasticPersonalProfile(
     @Id val userId: String,
-    @field:Field(type = Text) val dateOfBirth: String?,
-    @field:Field(type = Text) val civilStatus: String?,
+    @field:Field(type = Text) val dateOfBirth: LocalDate?,
+    @field:Field(type = Date) val civilStatus: String?,
     @field:Field(type = Text) val countryOfBirth: String?,
     @field:Field(type = Text) val nationality: String?,
     @field:Field(type = Text) val currentCountry: String?,
@@ -64,7 +66,7 @@ data class ElasticPersonalProfile(
 ) {
     fun toPersonalProfile(): PersonalProfile = PersonalProfile(
         userId = UserId(userId),
-        dateOfBirth = dateOfBirth?.let { Instant.parse(it) },
+        dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.let { CivilStatus.valueOf(it) },
         countryOfBirth = countryOfBirth?.let { Country.valueOf(it) },
         nationality = nationality?.let { Country.valueOf(it) },

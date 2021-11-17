@@ -13,7 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.role.AppRole.INTERVIEWEE
+import pl.wat.surveycompanyservice.domain.role.AppRole.INTERVIEWER
 import pl.wat.surveycompanyservice.infrastructure.filter.AuthenticationFilter
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
 
@@ -32,9 +34,21 @@ open class WebSecurityConfig(
             .sessionManagement().sessionCreationPolicy(STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers("/renew").authenticated()
-                .antMatchers("/personal-profile").authenticated()
-                .antMatchers("/personal-profile", "/personal-profile/*").hasRole(INTERVIEWEE.toString())
+                .antMatchers(
+                    "/renew",
+                    "/personal-profile",
+                    "/personal-profile/*",
+                    "/survey",
+                    "/survey/participants-count"
+                ).authenticated()
+                .antMatchers(
+                    "/personal-profile",
+                    "/personal-profile/*"
+                ).hasRole(INTERVIEWEE.toString())
+                .antMatchers(
+                    "/survey",
+                    "/survey/participants-count"
+                ).hasRole(INTERVIEWER.toString())
             .and()
             .addFilter(AuthenticationFilter(authenticationManager(), tokenService))
     }

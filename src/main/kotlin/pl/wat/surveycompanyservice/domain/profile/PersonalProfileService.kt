@@ -35,6 +35,9 @@ class PersonalProfileService(
     fun getProfileData(userId: UserId): PersonalProfileDto =
         personalProfileRepository.getProfile(userId).toPersonalProfileDto()
 
+    fun findEligibleParticipantIds(query: PersonalProfileQueryParams): List<String> =
+        personalProfileRepository.findEligibleParticipantIds(query)
+
     private fun getEmptyPersonalProfile(userId: UserId): PersonalProfile = PersonalProfile(
         userId = userId,
         dateOfBirth = null,

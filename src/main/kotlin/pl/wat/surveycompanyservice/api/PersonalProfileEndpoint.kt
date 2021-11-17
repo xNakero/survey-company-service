@@ -24,6 +24,7 @@ import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.infrastructure.validator.Enum
 import pl.wat.surveycompanyservice.shared.UserId
 import java.time.Instant
+import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.Min
 
@@ -80,7 +81,7 @@ data class PersonalProfileDto(
 }
 
 data class BasicInformation(
-    val dateOfBirth: Instant?,
+    val dateOfBirth: LocalDate?,
     @field:Enum(CivilStatus::class, message = "There is no such civil status.") val civilStatus: String?
 )
 
