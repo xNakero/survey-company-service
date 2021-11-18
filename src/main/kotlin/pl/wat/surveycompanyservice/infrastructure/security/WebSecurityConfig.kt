@@ -60,7 +60,7 @@ open class WebSecurityConfig(
     }
 
     override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/register", "/login")
+        web.ignoring().antMatchers("/register", "/login", "/ping")
     }
 
     @Bean

@@ -20,6 +20,16 @@ repositories {
 
 extra["testcontainersVersion"] = "1.16.0"
 
+val integration: SourceSet by sourceSets.creating {
+    groovy {
+        groovy.srcDir("src/integration/groovy")
+        resources.srcDir("src/integration/resources")
+        compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -31,20 +41,21 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.auth0:java-jwt:3.18.2")
-    
+
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.testcontainers:elasticsearch")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:mongodb")
-    testImplementation("org.testcontainers:postgresql")
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0")
     testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1")
 
+    "integrationImplementation"("org.spockframework:spock-spring:2.0-groovy-3.0")
+    "integrationImplementation"("org.springframework.boot:spring-boot-starter-test")
+    "integrationImplementation"("org.springframework.security:spring-security-test")
+    "integrationImplementation"("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1")
+
+    "integrationImplementation"("org.testcontainers:elasticsearch")
+    "integrationImplementation"("org.testcontainers:spock")
+    "integrationImplementation"("org.testcontainers:mongodb")
+    "integrationImplementation"("org.testcontainers:postgresql")
 }
 
 dependencyManagement {
@@ -60,6 +71,16 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+val integrationTaskTask = task<Test>("integrationTest") {
+    description = "Runs the integration tests"
+    group = "verification"
+
+    testClassesDirs = integration.output.classesDirs
+    classpath = integration.runtimeClasspath
+
+    mustRunAfter(tasks.test)
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
     testLogging {
@@ -67,25 +88,6 @@ tasks.withType<Test> {
     }
 }
 
-sourceSets {
-    create("integration") {
-        groovy {
-            groovy.srcDir("src/integration/groovy")
-            resources.srcDir("src/integration/resources")
-            compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
-            runtimeClasspath += output + compileClasspath
-        }
-    }
-}
-
-val integrationTest = task<Test>("integration") {
-    description = "Runs the integration tests"
-    group = "verification"
-    testClassesDirs = sourceSets["integration"].output.classesDirs
-    classpath = sourceSets["integration"].runtimeClasspath
-    mustRunAfter(tasks["test"])
-}
-
 tasks.check {
-    dependsOn(integrationTest)
+    dependsOn(integrationTaskTask)
 }
