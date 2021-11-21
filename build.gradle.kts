@@ -51,6 +51,7 @@ dependencies {
     "integrationImplementation"("org.springframework.boot:spring-boot-starter-test")
     "integrationImplementation"("org.springframework.security:spring-security-test")
     "integrationImplementation"("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1")
+    "integrationImplementation"("org.springframework.boot:spring-boot-starter-webflux")
 
     "integrationImplementation"("org.testcontainers:elasticsearch")
     "integrationImplementation"("org.testcontainers:spock")

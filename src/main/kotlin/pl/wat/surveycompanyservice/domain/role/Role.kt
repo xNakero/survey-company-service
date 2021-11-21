@@ -1,8 +1,12 @@
 package pl.wat.surveycompanyservice.domain.role
 
 import pl.wat.surveycompanyservice.domain.user.AppUser
-import javax.persistence.*
 import javax.persistence.CascadeType.ALL
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.ManyToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "role")
@@ -13,5 +17,5 @@ class Role(
 )
 
 enum class AppRole {
-    INTERVIEWEE, INTERVIEWER
+    PARTICIPANT, RESEARCHER
 }

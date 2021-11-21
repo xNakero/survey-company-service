@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -59,6 +60,15 @@ class ExceptionHandler {
             httpStatus = BAD_REQUEST,
             statusCode = BAD_REQUEST.value(),
             errors = exception.bindingResult.allErrors.map { it.defaultMessage }
+        )
+
+    @ExceptionHandler(BadCredentialsException::class)
+    @ResponseStatus(UNAUTHORIZED)
+    fun badCredentialsExceptionHandler(exception: BadCredentialsException) =
+        AppException(
+            httpStatus = UNAUTHORIZED,
+            statusCode = UNAUTHORIZED.value(),
+            errors = listOf(exception.message)
         )
 }
 

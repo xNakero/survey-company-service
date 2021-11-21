@@ -2,6 +2,7 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.elasticsearch.action.DocWriteResponse.Result
+import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.update.UpdateRequest
 import org.elasticsearch.client.RequestOptions.DEFAULT
@@ -29,8 +30,8 @@ class ElasticPersonalProfileRepository(
     private val objectMapper: ObjectMapper
 ) : PersonalProfileRepository {
 
-    override fun createEmptyProfile(personalProfile: PersonalProfile) {
-        elasticsearchRestTemplate.save(personalProfile.toMongoPersonalProfile())
+    override fun createProfile(personalProfile: PersonalProfile) {
+        elasticsearchRestTemplate.save(personalProfile.toElasticPersonalProfile())
     }
 
     override fun updateProfile(personalProfile: PersonalProfile): Result {

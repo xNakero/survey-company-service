@@ -17,7 +17,7 @@ class PersonalProfileService(
     private val personalProfileRepository: PersonalProfileRepository
 ) {
     fun createEmptyProfile(userId: UserId) =
-        getEmptyPersonalProfile(userId).let { personalProfileRepository.createEmptyProfile(it) }
+        getEmptyPersonalProfile(userId).let { personalProfileRepository.createProfile(it) }
 
     fun updateProfile(personalProfile: PersonalProfile) =
         personalProfileRepository.updateProfile(personalProfile)

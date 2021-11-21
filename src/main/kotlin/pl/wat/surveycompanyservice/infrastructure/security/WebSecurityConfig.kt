@@ -1,5 +1,6 @@
 package pl.wat.surveycompanyservice.infrastructure.security
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -13,9 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import pl.wat.surveycompanyservice.domain.role.AppRole
-import pl.wat.surveycompanyservice.domain.role.AppRole.INTERVIEWEE
-import pl.wat.surveycompanyservice.domain.role.AppRole.INTERVIEWER
+import pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
+import pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
 import pl.wat.surveycompanyservice.infrastructure.filter.AuthenticationFilter
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
 
@@ -24,7 +24,8 @@ import pl.wat.surveycompanyservice.infrastructure.token.TokenService
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 open class WebSecurityConfig(
     private val userService: UserDetailsService,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val objectMapper: ObjectMapper
 ): WebSecurityConfigurerAdapter(){
 
     override fun configure(http: HttpSecurity?) {
@@ -44,13 +45,13 @@ open class WebSecurityConfig(
                 .antMatchers(
                     "/personal-profile",
                     "/personal-profile/*"
-                ).hasRole(INTERVIEWEE.toString())
+                ).hasRole(PARTICIPANT.toString())
                 .antMatchers(
                     "/survey",
                     "/survey/participants-count"
-                ).hasRole(INTERVIEWER.toString())
+                ).hasRole(RESEARCHER.toString())
             .and()
-            .addFilter(AuthenticationFilter(authenticationManager(), tokenService))
+            .addFilter(AuthenticationFilter(authenticationManager(), tokenService, objectMapper))
     }
 
     override fun configure(auth: AuthenticationManagerBuilder?) {

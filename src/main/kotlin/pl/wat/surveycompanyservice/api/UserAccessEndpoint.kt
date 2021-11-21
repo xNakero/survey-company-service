@@ -33,21 +33,21 @@ class UserAccessEndpoint(
             role = AppRole.valueOf(request.role)
         )
 
-    @PostMapping("/renew")
+    @PostMapping("/refresh")
     @ResponseStatus(OK)
     fun renewToken(): TokensDto =
         userFacade.renewToken(SecurityContextHolder.getContext().authentication)
 }
 
 data class LoginRequest(
-    @field:Email(message = "Invalid email") val username: String,
+    @field:Email(message = "Provided email is not an email.") val username: String,
     @field:Length(min = 8, max = 32, message = "Password has to be between 8 and 32 characters.") val password: String
 )
 
 data class RegistrationRequest(
     @field:Email(message = "Provided email is not an email.") val username: String,
     @field:Length(min = 8, max = 32, message = "Password has to be between 8 and 32 characters.") val password: String,
-    @field:Enum(AppRole::class, message = "There is no such role") val role: String
+    @field:Enum(AppRole::class, message = "There is no such role.") val role: String
 )
 
 
