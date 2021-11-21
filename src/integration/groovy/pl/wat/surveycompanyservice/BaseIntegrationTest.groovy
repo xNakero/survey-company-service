@@ -29,8 +29,10 @@ import pl.wat.surveycompanyservice.domain.role.RoleRepository
 import pl.wat.surveycompanyservice.domain.user.UserRepository
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
 import java.time.Duration
+import java.time.LocalDate
 
 import static java.util.stream.Collectors.toList
 import static org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -46,6 +48,8 @@ import static pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 class BaseIntegrationTest extends Specification {
+
+    PollingConditions conditions = new PollingConditions(timeout: 10, delay: 0.1, factor: 2.0)
 
     @LocalServerPort
     protected int port
@@ -117,7 +121,11 @@ class BaseIntegrationTest extends Specification {
     }
 
     private void clearUsersDbs() {
-        List userIds = userRepository.findAll().stream().map {it.userId.toString() }.collect(toList())
+        List userIds = userRepository.findAll()
+                .stream()
+                .map {it.userId.toString() }
+                .collect(toList())
+
         userRepository.deleteAll()
         roleRepository.deleteAll()
 

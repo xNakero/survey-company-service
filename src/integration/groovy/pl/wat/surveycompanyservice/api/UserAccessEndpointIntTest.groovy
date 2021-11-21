@@ -42,7 +42,7 @@ class UserAccessEndpointIntTest extends BaseIntegrationTest {
             AppUser user = userRepository.findByUsername(username)
             user != null
             with(elasticsearchRestTemplate.get(user.userId.toString(), ElasticPersonalProfile.class)) {
-                userId == user.userId.toString()
+                participantId == user.userId.toString()
                 dateOfBirth == null
                 civilStatus == null
                 countryOfBirth == null

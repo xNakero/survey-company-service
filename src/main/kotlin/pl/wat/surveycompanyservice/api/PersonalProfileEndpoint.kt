@@ -22,8 +22,8 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileFacade
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.infrastructure.validator.Enum
+import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.UserId
-import java.time.Instant
 import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.Min
@@ -46,12 +46,12 @@ class PersonalProfileEndpoint(
     @PostMapping("/clear")
     @ResponseStatus(OK)
     fun clear(@AuthenticationPrincipal user: AppUser) =
-        personalProfileFacade.clearProfileData(UserId(user.userId.toString()))
+        personalProfileFacade.clearProfileData(ParticipantId(user.userId.toString()))
 
     @GetMapping
     @ResponseStatus(OK)
     fun get(@AuthenticationPrincipal user: AppUser): PersonalProfileDto =
-        personalProfileFacade.getProfileData(UserId(user.userId.toString()))
+        personalProfileFacade.getProfileData(ParticipantId(user.userId.toString()))
 }
 
 @Validated
@@ -63,7 +63,7 @@ data class PersonalProfileDto(
     @field:Valid val politicalViews: PoliticalViews
 ) {
     fun toPersonalProfile(userId: String): PersonalProfile = PersonalProfile(
-        userId = UserId(userId),
+        participantId = ParticipantId(userId),
         dateOfBirth = basicInformation.dateOfBirth,
         civilStatus = basicInformation.civilStatus?.let { CivilStatus.valueOf(it) },
         countryOfBirth = demographics.countryOfBirth?.let { Country.valueOf(it) },

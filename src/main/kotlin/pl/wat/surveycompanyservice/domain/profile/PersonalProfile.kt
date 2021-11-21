@@ -7,12 +7,13 @@ import org.springframework.data.elasticsearch.annotations.FieldType
 import org.springframework.data.elasticsearch.annotations.FieldType.Date
 import org.springframework.data.elasticsearch.annotations.FieldType.Integer
 import org.springframework.data.elasticsearch.annotations.FieldType.Text
+import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.UserId
 import java.time.LocalDate
 
 
 data class PersonalProfile(
-    val userId: UserId,
+    val participantId: ParticipantId,
     val dateOfBirth: LocalDate?,
     val civilStatus: CivilStatus?,
     val countryOfBirth: Country?,
@@ -29,7 +30,7 @@ data class PersonalProfile(
 ) {
 
     fun toElasticPersonalProfile(): ElasticPersonalProfile = ElasticPersonalProfile(
-        userId = userId.raw,
+        participantId = participantId.raw,
         dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.toString(),
         countryOfBirth = countryOfBirth?.toString(),
@@ -48,7 +49,7 @@ data class PersonalProfile(
 
 @Document(indexName = "personal_profile")
 data class ElasticPersonalProfile(
-    @Id val userId: String,
+    @Id val participantId: String,
     @field:Field(type = Date) val dateOfBirth: LocalDate?,
     @field:Field(type = Text) val civilStatus: String?,
     @field:Field(type = Text) val countryOfBirth: String?,
@@ -64,7 +65,7 @@ data class ElasticPersonalProfile(
     @field:Field(type = Text) val politicalSide: String?
 ) {
     fun toPersonalProfile(): PersonalProfile = PersonalProfile(
-        userId = UserId(userId),
+        participantId = ParticipantId(participantId),
         dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.let { CivilStatus.valueOf(it) },
         countryOfBirth = countryOfBirth?.let { Country.valueOf(it) },
@@ -90,7 +91,7 @@ enum class Country {
 }
 
 enum class Language {
-    POLISH, GERMAN, ENGLISH_UK
+    POLISH, GERMAN, ENGLISH
 }
 
 enum class EmploymentStatus {

@@ -2,6 +2,7 @@ package pl.wat.surveycompanyservice.domain.profile
 
 import org.elasticsearch.action.DocWriteResponse.Result
 import org.elasticsearch.action.DocWriteResponse.Result.NOOP
+import org.elasticsearch.action.DocWriteResponse.Result.NOT_FOUND
 import org.elasticsearch.action.DocWriteResponse.Result.UPDATED
 import org.springframework.stereotype.Service
 import pl.wat.surveycompanyservice.api.BasicInformation
@@ -10,36 +11,36 @@ import pl.wat.surveycompanyservice.api.Education
 import pl.wat.surveycompanyservice.api.PersonalProfileDto
 import pl.wat.surveycompanyservice.api.PoliticalViews
 import pl.wat.surveycompanyservice.api.Work
-import pl.wat.surveycompanyservice.shared.UserId
+import pl.wat.surveycompanyservice.shared.ParticipantId
 
 @Service
 class PersonalProfileService(
     private val personalProfileRepository: PersonalProfileRepository
 ) {
-    fun createEmptyProfile(userId: UserId) =
-        getEmptyPersonalProfile(userId).let { personalProfileRepository.createProfile(it) }
+    fun createEmptyProfile(participantId: ParticipantId) =
+        getEmptyPersonalProfile(participantId).let { personalProfileRepository.save(it) }
 
     fun updateProfile(personalProfile: PersonalProfile) =
         personalProfileRepository.updateProfile(personalProfile)
             .handleUpdate(personalProfile)
 
-    fun clearProfileData(userId: UserId): PersonalProfileDto {
-        val emptyPersonalProfile = getEmptyPersonalProfile(userId)
+    fun clearProfileData(participantId: ParticipantId): PersonalProfileDto {
+        val emptyPersonalProfile = getEmptyPersonalProfile(participantId)
         val result = personalProfileRepository.updateProfile(emptyPersonalProfile)
         if (result in listOf(UPDATED, NOOP) )
             return emptyPersonalProfile.toPersonalProfileDto()
         else
-            throw UnknownOperationException("There was an error when clearing profile of user with id: ${userId.raw}")
+            throw UnknownOperationException("There was an error when clearing profile of user with id: ${participantId.raw}")
     }
 
-    fun getProfileData(userId: UserId): PersonalProfileDto =
-        personalProfileRepository.getProfile(userId).toPersonalProfileDto()
+    fun getProfileData(participantId: ParticipantId): PersonalProfileDto =
+        personalProfileRepository.findProfile(participantId).toPersonalProfileDto()
 
     fun findEligibleParticipantIds(query: PersonalProfileQueryParams): List<String> =
         personalProfileRepository.findEligibleParticipantIds(query)
 
-    private fun getEmptyPersonalProfile(userId: UserId): PersonalProfile = PersonalProfile(
-        userId = userId,
+    private fun getEmptyPersonalProfile(participantId: ParticipantId): PersonalProfile = PersonalProfile(
+        participantId = participantId,
         dateOfBirth = null,
         civilStatus = null,
         countryOfBirth = null,
@@ -57,10 +58,10 @@ class PersonalProfileService(
 
     private fun Result.handleUpdate(personalProfile: PersonalProfile): PersonalProfileDto {
         return when (this) {
-            Result.NOT_FOUND -> throw NoPersonalProfileFoundException("There is no personal profile for user with id: ${personalProfile.userId.raw}.")
+            NOT_FOUND -> throw NoPersonalProfileFoundException("There is no personal profile for user with id: ${personalProfile.participantId.raw}.")
             NOOP -> personalProfile.toPersonalProfileDto()
-            UPDATED -> personalProfileRepository.getProfile(personalProfile.userId).toPersonalProfileDto()
-            else -> throw UnknownOperationException("There was an error when updating profile of user with id: ${personalProfile.userId.raw}")
+            UPDATED -> personalProfileRepository.findProfile(personalProfile.participantId).toPersonalProfileDto()
+            else -> throw UnknownOperationException("There was an error when updating profile of user with id: ${personalProfile.participantId.raw}")
         }
     }
 }

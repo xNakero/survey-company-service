@@ -1,23 +1,24 @@
 package pl.wat.surveycompanyservice.infrastructure.repository
 
 import org.elasticsearch.action.DocWriteResponse
+import org.jetbrains.annotations.NotNull
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileRepository
+import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.UserId
 
 import java.util.concurrent.CopyOnWriteArraySet
-import java.util.stream.Collectors
 
 class InMemoryPersonalProfileRepository implements PersonalProfileRepository{
 
     Set<PersonalProfile> personalProfiles = new CopyOnWriteArraySet<>()
 
     @Override
-    void createProfile(PersonalProfile personalProfile) {
+    void save(PersonalProfile personalProfile) {
         personalProfiles.remove(
                 personalProfiles.find {
-                    it.userId == personalProfile.userId
+                    it.participantId == personalProfile.participantId
                 }
         )
         personalProfiles.add(personalProfile)
@@ -28,9 +29,10 @@ class InMemoryPersonalProfileRepository implements PersonalProfileRepository{
         return null
     }
 
+    @NotNull
     @Override
-    PersonalProfile getProfile(UserId userId) {
-        return personalProfiles.find {it.userId == userId}
+    PersonalProfile findProfile(@NotNull ParticipantId participantId) {
+        return personalProfiles.find {it.participantId == userId}
     }
 
     @Override
@@ -47,6 +49,6 @@ class InMemoryPersonalProfileRepository implements PersonalProfileRepository{
     }
 
     boolean containsProfileWithId(String id) {
-        return personalProfiles.findAll {it.userId.raw == '1'}.size() == 1
+        return personalProfiles.findAll {it.participantId.raw == '1'}.size() == 1
     }
 }

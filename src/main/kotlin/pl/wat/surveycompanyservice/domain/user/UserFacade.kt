@@ -7,6 +7,7 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileFacade
 import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
+import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.UserId
 import javax.transaction.Transactional
 
@@ -28,7 +29,7 @@ class UserFacade(
     fun createUser(username: String, password: String, role: AppRole) {
         val user = userService.createUser(username, password, role)
         if (role == PARTICIPANT) {
-            personalProfileFacade.createEmptyProfile(UserId(user.userId.toString()))
+            personalProfileFacade.createEmptyProfile(ParticipantId(user.userId.toString()))
         }
     }
 
