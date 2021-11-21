@@ -23,7 +23,6 @@ import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.infrastructure.validator.Enum
 import pl.wat.surveycompanyservice.shared.ParticipantId
-import pl.wat.surveycompanyservice.shared.UserId
 import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.Min
@@ -41,7 +40,6 @@ class PersonalProfileEndpoint(
         @Valid @RequestBody request: PersonalProfileDto
     ): PersonalProfileDto =
         personalProfileFacade.updateProfile(request.toPersonalProfile(user.userId.toString()))
-
 
     @PostMapping("/clear")
     @ResponseStatus(OK)

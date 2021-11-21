@@ -10,7 +10,10 @@ import pl.wat.surveycompanyservice.domain.profile.Language
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
+import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.ResearcherId
+import pl.wat.surveycompanyservice.shared.SurveyId
 
 import java.time.LocalDate
 
@@ -32,6 +35,16 @@ class IntegrationTestBuilders {
     public static final String INDUSTRY = 'FINANCE'
     public static final String POLITICAL_SIDE = 'CENTRE'
     public static final String PARTICIPANT_ID = '1'
+
+    public static String SURVEY_ID = '61cb2fbf-e83a-4fd2-9d7b-879686653699'
+    public static String RESEARCHER_ID = '2'
+    public static String TITLE = 'Title'
+    public static String URL = 'http://survey.com'
+    public static int TIME_TO_COMPLETE_IN_SECONDS = 3600
+    public static String DESCRIPTION = 'Description'
+    public static int SPOTS_TOTAL = 12
+    public static int SPOTS_TAKEN = 0
+    public static String COMPLETION_CODE = 'SQVQ3RBFSKSJ0X9UTWXJSPP306QO5C2L'
 
     static Map researcherRegistrationRequest(Map params = [:]) {
         return [
@@ -151,6 +164,34 @@ class IntegrationTestBuilders {
                 formOfEmployment,
                 industry,
                 politicalSide
+        )
+    }
+
+    static Survey survey(Map params = [:]) {
+        SurveyId surveyId =  params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
+        ResearcherId researcherId = params.researcherId != null ? new ResearcherId(params.researcherId) : new ResearcherId(RESEARCHER_ID)
+        List participantIds = params.participantsIds as List ?: []
+        List eligibleParticipantIds = params.eligibleParticipantIds as List ?: []
+        String title = params.title as String ?: TITLE
+        String url = params.url as String ?: URL
+        Integer timeToCompleteInSeconds = params.timeToCompleteInSeconds as Integer ?: TIME_TO_COMPLETE_IN_SECONDS
+        String description = params.description as String ?: DESCRIPTION
+        Integer spotsTotal = params.spotsTotal as Integer ?: SPOTS_TOTAL
+        Integer spotsTaken = params.spotsTaken as Integer ?: SPOTS_TAKEN
+        String completionCode = params.completionCode as String ?: COMPLETION_CODE
+
+        return new Survey(
+                surveyId,
+                researcherId,
+                participantIds,
+                eligibleParticipantIds,
+                title,
+                url,
+                timeToCompleteInSeconds,
+                description,
+                spotsTotal,
+                spotsTaken,
+                completionCode
         )
     }
 }
