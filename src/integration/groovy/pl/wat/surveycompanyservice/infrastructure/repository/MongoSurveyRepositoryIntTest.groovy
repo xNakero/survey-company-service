@@ -8,7 +8,7 @@ import pl.wat.surveycompanyservice.domain.survey.Survey
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
 
-class MongoSurveyRepositoryIntTest extends BaseIntegrationTest{
+class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
 
     @Autowired
     MongoSurveyRepository mongoSurveyRepository

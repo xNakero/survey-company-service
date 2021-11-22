@@ -54,6 +54,7 @@ class ElasticPersonalProfileRepositoryIntTest extends BaseIntegrationTest {
         given:
             PersonalProfile defaultProfile = personalProfile()
             elasticsearchRestTemplate.save(defaultProfile.toElasticPersonalProfile())
+            Thread.sleep(1000)
             Map updateRequestMap = [
                     dateOfBirth                  : '2001-12-12',
                     civilStatus                  : 'MARRIED',
@@ -71,13 +72,8 @@ class ElasticPersonalProfileRepositoryIntTest extends BaseIntegrationTest {
             ]
             PersonalProfile updateRequest = personalProfile(updateRequestMap)
         when:
-            Result noChangeResult = elasticPersonalProfileRepository.updateProfile(defaultProfile)
+            elasticPersonalProfileRepository.updateProfile(updateRequest)
         then:
-            noChangeResult == NOOP
-        when:
-            Result updatedResult = elasticPersonalProfileRepository.updateProfile(updateRequest)
-        then:
-            updatedResult == UPDATED
             with(elasticsearchRestTemplate.get(PARTICIPANT_ID, ElasticPersonalProfile.class).toPersonalProfile()) {
                 it.dateOfBirth == LocalDate.parse('2001-12-12')
                 it.civilStatus == MARRIED
@@ -218,6 +214,5 @@ class ElasticPersonalProfileRepositoryIntTest extends BaseIntegrationTest {
             eligibleParticipantIds3.contains(personalProfile2.participantId.raw)
             eligibleParticipantIds4.contains(personalProfile3.participantId.raw)
             eligibleParticipantIds5.contains(personalProfile2.participantId.raw)
-
     }
 }

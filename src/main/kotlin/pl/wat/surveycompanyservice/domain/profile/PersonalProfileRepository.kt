@@ -5,7 +5,7 @@ import pl.wat.surveycompanyservice.shared.ParticipantId
 
 interface PersonalProfileRepository {
     fun save(personalProfile: PersonalProfile)
-    fun updateProfile(personalProfile: PersonalProfile): Result
+    fun updateProfile(personalProfile: PersonalProfile)
     fun findProfile(participantId: ParticipantId): PersonalProfile
     fun findEligibleParticipantIds(queryParams: PersonalProfileQueryParams): List<String>
 }

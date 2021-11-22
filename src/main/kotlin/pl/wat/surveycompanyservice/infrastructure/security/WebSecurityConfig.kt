@@ -14,10 +14,12 @@ import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
 import pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
 import pl.wat.surveycompanyservice.infrastructure.filter.AuthenticationFilter
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
+
 
 @EnableWebSecurity
 @Configuration
@@ -36,19 +38,17 @@ open class WebSecurityConfig(
             .and()
             .authorizeRequests()
                 .antMatchers(
-                    "/renew",
-                    "/personal-profile",
-                    "/personal-profile/*",
-                    "/survey",
-                    "/survey/participants-count"
+                    "renew",
+                    "personal-profile",
+                    "survey",
+                    "survey/participants-count"
                 ).authenticated()
                 .antMatchers(
-                    "/personal-profile",
-                    "/personal-profile/*"
+                    "personal-profile"
                 ).hasRole(PARTICIPANT.toString())
                 .antMatchers(
-                    "/survey",
-                    "/survey/participants-count"
+                    "survey",
+                    "survey/participants-count"
                 ).hasRole(RESEARCHER.toString())
             .and()
             .addFilter(AuthenticationFilter(authenticationManager(), tokenService, objectMapper))
@@ -61,7 +61,7 @@ open class WebSecurityConfig(
     }
 
     override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/register", "/login", "/ping")
+        web.ignoring().antMatchers("/register", "/login")
     }
 
     @Bean

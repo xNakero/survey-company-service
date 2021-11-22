@@ -20,17 +20,9 @@ class PersonalProfileService(
     fun createEmptyProfile(participantId: ParticipantId) =
         getEmptyPersonalProfile(participantId).let { personalProfileRepository.save(it) }
 
-    fun updateProfile(personalProfile: PersonalProfile) =
+    fun updateProfile(personalProfile: PersonalProfile): PersonalProfileDto {
         personalProfileRepository.updateProfile(personalProfile)
-            .handleUpdate(personalProfile)
-
-    fun clearProfileData(participantId: ParticipantId): PersonalProfileDto {
-        val emptyPersonalProfile = getEmptyPersonalProfile(participantId)
-        val result = personalProfileRepository.updateProfile(emptyPersonalProfile)
-        if (result in listOf(UPDATED, NOOP) )
-            return emptyPersonalProfile.toPersonalProfileDto()
-        else
-            throw UnknownOperationException("There was an error when clearing profile of user with id: ${participantId.raw}")
+        return personalProfileRepository.findProfile(personalProfile.participantId).toPersonalProfileDto()
     }
 
     fun getProfileData(participantId: ParticipantId): PersonalProfileDto =
@@ -55,42 +47,30 @@ class PersonalProfileService(
         industry = null,
         politicalSide = null
     )
-
-    private fun Result.handleUpdate(personalProfile: PersonalProfile): PersonalProfileDto {
-        return when (this) {
-            NOT_FOUND -> throw NoPersonalProfileFoundException("There is no personal profile for user with id: ${personalProfile.participantId.raw}.")
-            NOOP -> personalProfile.toPersonalProfileDto()
-            UPDATED -> personalProfileRepository.findProfile(personalProfile.participantId).toPersonalProfileDto()
-            else -> throw UnknownOperationException("There was an error when updating profile of user with id: ${personalProfile.participantId.raw}")
-        }
-    }
 }
 
 fun PersonalProfile.toPersonalProfileDto(): PersonalProfileDto = PersonalProfileDto(
     basicInformation = BasicInformation(
         dateOfBirth = dateOfBirth,
-        civilStatus = civilStatus.toString()
+        civilStatus = civilStatus?.toString()
     ),
     demographics = Demographics(
-        countryOfBirth = countryOfBirth.toString(),
-        nationality = nationality.toString(),
-        currentCountry = currentCountry.toString(),
-        firstLanguage = firstLanguage.toString()
+        countryOfBirth = countryOfBirth?.toString(),
+        nationality = nationality?.toString(),
+        currentCountry = currentCountry?.toString(),
+        firstLanguage = firstLanguage?.toString()
     ),
     education = Education(
-        highestEducationLevelAchieved = highestEducationLevelAchieved.toString(),
+        highestEducationLevelAchieved = highestEducationLevelAchieved?.toString(),
         isStudent = isStudent
     ),
     work = Work(
         monthlyIncome = monthlyIncome,
-        employmentStatus = employmentStatus.toString(),
-        formOfEmployment = formOfEmployment.toString(),
-        industry = industry.toString()
+        employmentStatus = employmentStatus?.toString(),
+        formOfEmployment = formOfEmployment?.toString(),
+        industry = industry?.toString()
     ),
     politicalViews = PoliticalViews(
-        politicalSide = politicalSide.toString()
+        politicalSide = politicalSide?.toString()
     )
 )
-
-class NoPersonalProfileFoundException(message: String?) : RuntimeException(message)
-class UnknownOperationException(message: String?) : RuntimeException(message)

@@ -1,5 +1,13 @@
 package pl.wat.surveycompanyservice
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Autowired
+import pl.wat.surveycompanyservice.api.BasicInformation
+import pl.wat.surveycompanyservice.api.Demographics
+import pl.wat.surveycompanyservice.api.Education
+import pl.wat.surveycompanyservice.api.PersonalProfileDto
+import pl.wat.surveycompanyservice.api.PoliticalViews
+import pl.wat.surveycompanyservice.api.Work
 import pl.wat.surveycompanyservice.domain.profile.CivilStatus
 import pl.wat.surveycompanyservice.domain.profile.Country
 import pl.wat.surveycompanyservice.domain.profile.EducationLevel
@@ -46,66 +54,69 @@ class IntegrationTestBuilders {
     public static int SPOTS_TAKEN = 0
     public static String COMPLETION_CODE = 'SQVQ3RBFSKSJ0X9UTWXJSPP306QO5C2L'
 
+    @Autowired
+    ObjectMapper objectMapper
+
     static Map researcherRegistrationRequest(Map params = [:]) {
         return [
-                username    : params.username ?: RESEARCHER_USERNAME,
-                password    : params.password ?: PASSWORD,
-                role        : "RESEARCHER"
+                username: params.username ?: RESEARCHER_USERNAME,
+                password: params.password ?: PASSWORD,
+                role    : "RESEARCHER"
         ]
     }
 
     static Map participantRegistrationRequest(Map params = [:]) {
         return [
-                username    : params.username ?: PARTICIPANT_USERNAME,
-                password    : params.password ?: PASSWORD,
-                role        : "PARTICIPANT"
+                username: params.username ?: PARTICIPANT_USERNAME,
+                password: params.password ?: PASSWORD,
+                role    : "PARTICIPANT"
         ]
     }
 
     static Map loginRequest(Map params = [:]) {
         return [
-                username    : params.username ?: RESEARCHER_USERNAME,
-                password    : params.password ?: PASSWORD
+                username: params.username ?: RESEARCHER_USERNAME,
+                password: params.password ?: PASSWORD
         ]
     }
 
-    static Map personalProfileDto(Map params = [:]) {
-        return [
-                basicInformation: [
-                        dateOfBirth: params.dateOfBirth ?: DATE_OF_BIRTH,
-                        civilStatus: params.civilStatus ?: CIVIL_STATUS
-                ],
-                demographics    : [
-                        countryOfBirth: params.countryOfBirth ?: COUNTRY,
-                        nationality   : params.nationality ?: COUNTRY,
-                        currentCountry: params.currentCountry ?: COUNTRY,
-                        firstLanguage : params.firstLanguage ?: LANGUAGE
-                ],
-                education       : [
-                        highestEducationLevelAchieved: params.highestEducationLevelAchieved ?: EDUCATION_LEVEL,
-                        isStudent                    : params.isStudent as Boolean ?: IS_STUDENT
-                ],
-                work            : [
-                        monthlyIncome   : params.monthlyIncome as Integer ?: MONTHLY_INCOME,
-                        employmentStatus: params.employmentStatus ?: EMPLOYMENT_STATUS,
-                        formOfEmployment: params.formOfEmployment ?: FORM_OF_EMPLOYMENT,
-                        industry        : params.industry ?: INDUSTRY
-                ],
-                politicalViews  : [
-                        politicalSide: params.politicalSide ?: POLITICAL_SIDE
-                ]
-        ]
+    static PersonalProfileDto personalProfileDto(Map params = [:]) {
+        return new PersonalProfileDto(
+                new BasicInformation(
+                        params.dateOfBirth ? LocalDate.parse(params.dateOfBirth) : DATE_OF_BIRTH,
+                        params.civilStatus as String ?: CIVIL_STATUS
+                ),
+                new Demographics(
+                        params.countryOfBirth as String ?: COUNTRY,
+                        params.nationality as String ?: COUNTRY,
+                        params.currentCountry as String ?: COUNTRY,
+                        params.firstLanguage as String ?: LANGUAGE
+                ),
+                new Education(
+                        params.highestEducationLevelAchieved as String ?: EDUCATION_LEVEL,
+                        params.isStudent as Boolean ?: IS_STUDENT
+                ),
+                new Work(
+                        params.monthlyIncome as Integer ?: MONTHLY_INCOME,
+                        params.employmentStatus as String ?: EMPLOYMENT_STATUS,
+                        params.formOfEmployment as String ?: FORM_OF_EMPLOYMENT,
+                        params.industry as String ?: INDUSTRY
+                ),
+                new PoliticalViews(
+                        params.politicalSide as String ?: POLITICAL_SIDE
+                )
+        )
     }
 
     static PersonalProfile personalProfile(Map params = [:]) {
         ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
         LocalDate dateOfBirth = params.dateOfBirth ? LocalDate.parse(params.dateOfBirth) : DATE_OF_BIRTH
-        CivilStatus civilStatus = params.civilStatus as CivilStatus?: CivilStatus.valueOf(CIVIL_STATUS)
+        CivilStatus civilStatus = params.civilStatus as CivilStatus ?: CIVIL_STATUS as CivilStatus
         Country countryOfBirth = params.countryOfBirth as Country ?: COUNTRY as Country
         Country nationality = params.nationality as Country ?: COUNTRY as Country
         Country currentCountry = params.currentCountry as Country ?: COUNTRY as Country
         Language firstLanguage = params.firstLanguage as Language ?: LANGUAGE as Language
-        EducationLevel highestEducationLevelAchieved = params.highestEducationLevelAchieved as EducationLevel?: EDUCATION_LEVEL as EducationLevel
+        EducationLevel highestEducationLevelAchieved = params.highestEducationLevelAchieved as EducationLevel ?: EDUCATION_LEVEL as EducationLevel
         Boolean isStudent = params.isStudent as Boolean ?: IS_STUDENT
         int monthlyIncome = params.monthlyIncome as Integer ?: MONTHLY_INCOME
         EmploymentStatus employmentStatus = params.employmentStatus as EmploymentStatus ?: EMPLOYMENT_STATUS as EmploymentStatus
@@ -168,7 +179,7 @@ class IntegrationTestBuilders {
     }
 
     static Survey survey(Map params = [:]) {
-        SurveyId surveyId =  params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
+        SurveyId surveyId = params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
         ResearcherId researcherId = params.researcherId != null ? new ResearcherId(params.researcherId) : new ResearcherId(RESEARCHER_ID)
         List participantIds = params.participantsIds as List ?: []
         List eligibleParticipantIds = params.eligibleParticipantIds as List ?: []

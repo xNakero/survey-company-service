@@ -32,7 +32,6 @@ import javax.validation.constraints.Min
 class PersonalProfileEndpoint(
     private val personalProfileFacade: PersonalProfileFacade
 ) {
-
     @PutMapping
     @ResponseStatus(OK)
     fun update(
@@ -40,11 +39,6 @@ class PersonalProfileEndpoint(
         @Valid @RequestBody request: PersonalProfileDto
     ): PersonalProfileDto =
         personalProfileFacade.updateProfile(request.toPersonalProfile(user.userId.toString()))
-
-    @PostMapping("/clear")
-    @ResponseStatus(OK)
-    fun clear(@AuthenticationPrincipal user: AppUser) =
-        personalProfileFacade.clearProfileData(ParticipantId(user.userId.toString()))
 
     @GetMapping
     @ResponseStatus(OK)
@@ -84,9 +78,9 @@ data class BasicInformation(
 )
 
 data class Demographics(
-    @field:Enum(Country::class, message = "There is no such country.") val countryOfBirth: String?,
-    @field:Enum(Country::class, message = "There is no such country.") val nationality: String?,
-    @field:Enum(Country::class, message = "There is no such country.") val currentCountry: String?,
+    @field:Enum(Country::class, message = "There is no such country for countryOBirth.") val countryOfBirth: String?,
+    @field:Enum(Country::class, message = "There is no such country for nationality.") val nationality: String?,
+    @field:Enum(Country::class, message = "There is no such country for currentCountry.") val currentCountry: String?,
     @field:Enum(Language::class, message = "There is no such language.") val firstLanguage: String?
 )
 

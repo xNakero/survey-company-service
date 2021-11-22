@@ -17,7 +17,7 @@ class MongoSurveyRepository(
         try {
             mongoOperations.insert(survey.toMongoSurvey())
         } catch (e: DuplicateKeyException) {
-            logger.warn("Duplicated id: ${survey.id}")
+            logger.warn("Duplicated id: ${survey.id}. Try to publish the survey again")
         }
     }
 

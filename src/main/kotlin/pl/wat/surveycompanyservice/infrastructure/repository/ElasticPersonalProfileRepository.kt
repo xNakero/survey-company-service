@@ -1,52 +1,80 @@
 package pl.wat.surveycompanyservice.infrastructure.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.elasticsearch.action.DocWriteResponse.Result
+import org.elasticsearch.action.DocWriteResponse.Result.NOOP
+import org.elasticsearch.action.DocWriteResponse.Result.UPDATED
+import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.action.search.SearchRequest
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy.IMMEDIATE
 import org.elasticsearch.action.update.UpdateRequest
 import org.elasticsearch.client.RequestOptions.DEFAULT
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.common.xcontent.XContentType.JSON
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.rest.RestStatus.CREATED
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.builder.SearchSourceBuilder
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
-import org.springframework.data.elasticsearch.core.query.Criteria
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery
+import org.springframework.data.elasticsearch.annotations.Field
+import org.springframework.data.elasticsearch.annotations.FieldType
 import org.springframework.stereotype.Component
+import pl.wat.surveycompanyservice.domain.profile.CivilStatus
+import pl.wat.surveycompanyservice.domain.profile.Country
+import pl.wat.surveycompanyservice.domain.profile.EducationLevel
 import pl.wat.surveycompanyservice.domain.profile.ElasticPersonalProfile
+import pl.wat.surveycompanyservice.domain.profile.EmploymentStatus
+import pl.wat.surveycompanyservice.domain.profile.FormOfEmployment
+import pl.wat.surveycompanyservice.domain.profile.Industry
+import pl.wat.surveycompanyservice.domain.profile.Language
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileRepository
+import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import java.time.Clock
 import java.time.LocalDate
 
 @Component
 class ElasticPersonalProfileRepository(
-    private val elasticsearchRestTemplate: ElasticsearchRestTemplate,
     private val client: RestHighLevelClient,
     private val objectMapper: ObjectMapper,
     private val clock: Clock
 ) : PersonalProfileRepository {
 
     override fun save(personalProfile: PersonalProfile) {
-        elasticsearchRestTemplate.save(personalProfile.toElasticPersonalProfile())
+        val profileAsMap = personalProfile.toMap()
+        val indexRequest = IndexRequest(INDEX)
+            .id(personalProfile.participantId.raw)
+            .source(profileAsMap)
+            .setRefreshPolicy(IMMEDIATE)
+
+        val indexResponse = client.index(indexRequest, DEFAULT)
+        if (indexResponse.status() != CREATED) {
+            throw IndexingErrorException("Personal profile with id: ${personalProfile.participantId.raw} was not saved.")
+        }
     }
 
-    override fun updateProfile(personalProfile: PersonalProfile): Result {
-        val updateJson = personalProfile.mapToUpdates()
+    override fun updateProfile(personalProfile: PersonalProfile) {
+        val updateJson = personalProfile.toJson()
         val updateRequest = UpdateRequest(INDEX, personalProfile.participantId.raw)
             .doc(updateJson, JSON)
+            .setRefreshPolicy(IMMEDIATE)
         val updateResponse = client.update(updateRequest, DEFAULT)
-        return updateResponse.result
+        if (updateResponse.result !in setOf(UPDATED, NOOP)) {
+            throw UpdatingErrorException("Personal profile with id: ${personalProfile.participantId.raw} was not updated.")
+        }
     }
 
     override fun findProfile(participantId: ParticipantId): PersonalProfile {
-        val query = CriteriaQuery(Criteria(ID).`is`(participantId.raw))
-        val hits = elasticsearchRestTemplate.search(query, ElasticPersonalProfile::class.java, IndexCoordinates.of(INDEX))
-        return hits.getSearchHit(0).content.toPersonalProfile()
+        val searchRequest = SearchRequest(INDEX)
+        val searchSourceBuilder = SearchSourceBuilder()
+        val boolQuery = QueryBuilders.boolQuery()
+
+        boolQuery.must(QueryBuilders.matchQuery(ID, participantId.raw))
+
+        searchSourceBuilder.query(boolQuery)
+        searchRequest.source(searchSourceBuilder)
+        val result = client.search(searchRequest, DEFAULT).internalResponse.hits().hits
+        return result.map { it.toElasticPersonalProfile() }.first().toPersonalProfile(participantId)
     }
 
     override fun findEligibleParticipantIds(queryParams: PersonalProfileQueryParams): List<String> {
@@ -101,8 +129,13 @@ class ElasticPersonalProfileRepository(
         return result.map { it.toParticipantId() }
     }
 
-    private fun PersonalProfile.mapToUpdates(): String {
-        val updates: MutableMap<String, Any?> = mutableMapOf(
+    private fun PersonalProfile.toJson(): String {
+        val updates: MutableMap<String, Any?> = this.toMap()
+        return objectMapper.writeValueAsString(updates)
+    }
+
+    private fun PersonalProfile.toMap(): MutableMap<String, Any?> =
+        mutableMapOf(
             DATE_OF_BIRTH to dateOfBirth,
             CIVIL_STATUS to civilStatus,
             COUNTRY_OF_BIRTH to countryOfBirth,
@@ -117,12 +150,12 @@ class ElasticPersonalProfileRepository(
             INDUSTRY to industry,
             POLITICAL_SIDE to politicalSide
         )
-        return objectMapper.writeValueAsString(updates)
-    }
+
+    private fun SearchHit.toElasticPersonalProfile(): PersonalProfileSearchResult =
+        objectMapper.readValue(this.sourceAsString, PersonalProfileSearchResult::class.java)
 
     private fun SearchHit.toParticipantId(): String =
         objectMapper.readValue(this.sourceAsString, ElasticPersonalProfile::class.java).participantId
-
 
     companion object {
         const val ID = "_id"
@@ -142,3 +175,39 @@ class ElasticPersonalProfileRepository(
         const val INDEX = "personal_profile"
     }
 }
+
+data class PersonalProfileSearchResult(
+    val dateOfBirth: LocalDate?,
+    val civilStatus: String?,
+    val countryOfBirth: String?,
+    val nationality: String?,
+    val currentCountry: String?,
+    val firstLanguage: String?,
+    val highestEducationLevelAchieved: String?,
+    val isStudent: Boolean?,
+    val monthlyIncome: Int?,
+    val employmentStatus: String?,
+    val formOfEmployment: String?,
+    val industry: String?,
+    val politicalSide: String?
+) {
+    fun toPersonalProfile(participantId: ParticipantId): PersonalProfile = PersonalProfile(
+        participantId = participantId,
+        dateOfBirth = dateOfBirth,
+        civilStatus = civilStatus?.let { CivilStatus.valueOf(it) },
+        countryOfBirth = countryOfBirth?.let { Country.valueOf(it) },
+        nationality = nationality?.let { Country.valueOf(it) },
+        currentCountry = currentCountry?.let { Country.valueOf(it) },
+        firstLanguage = firstLanguage?.let { Language.valueOf(it) },
+        highestEducationLevelAchieved = highestEducationLevelAchieved?.let { EducationLevel.valueOf(it) },
+        isStudent = isStudent,
+        monthlyIncome = monthlyIncome,
+        employmentStatus = employmentStatus?.let { EmploymentStatus.valueOf(it) },
+        formOfEmployment = formOfEmployment?.let { FormOfEmployment.valueOf(it) },
+        industry = industry?.let { Industry.valueOf(it) },
+        politicalSide = politicalSide?.let { PoliticalSide.valueOf(it) }
+    )
+}
+
+class IndexingErrorException(message: String?) : RuntimeException(message)
+class UpdatingErrorException(message: String?) : RuntimeException(message)

@@ -14,9 +14,6 @@ class PersonalProfileFacade(
     fun updateProfile(personalProfile: PersonalProfile): PersonalProfileDto =
         personalProfileService.updateProfile(personalProfile)
 
-    fun clearProfileData(participantId: ParticipantId) =
-        personalProfileService.clearProfileData(participantId)
-
     fun getProfileData(participantId: ParticipantId): PersonalProfileDto =
         personalProfileService.getProfileData(participantId)
 }

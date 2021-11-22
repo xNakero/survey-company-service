@@ -1,7 +1,9 @@
 package pl.wat.surveycompanyservice
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.CompileStatic
 import groovyx.net.http.ContentType
+import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
 import org.elasticsearch.client.RestHighLevelClient
 import org.springframework.beans.factory.annotation.Autowired
@@ -71,6 +73,9 @@ class BaseIntegrationTest extends Specification {
     @Autowired
     ElasticsearchRestTemplate elasticsearchRestTemplate
 
+    @Autowired
+    ObjectMapper objectMapper
+
     @Shared
     private static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:latest")
 
@@ -107,7 +112,8 @@ class BaseIntegrationTest extends Specification {
     }
 
     void authAs(String username, String password) {
-        Map tokens = restClient.post(path: '/login', body: loginRequest([username: username, password: password]))
+        HttpResponseDecorator response = restClient.post(path: '/login', body: loginRequest([username: username, password: password]))
+        Map tokens = response.data
         restClient.headers.put(AUTHORIZATION, tokens['authorizationToken'])
     }
 
