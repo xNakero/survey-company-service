@@ -10,9 +10,6 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
 
 class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
 
-    @Autowired
-    MongoSurveyRepository mongoSurveyRepository
-
     def 'should save survey'() {
         given:
             Survey survey = survey()

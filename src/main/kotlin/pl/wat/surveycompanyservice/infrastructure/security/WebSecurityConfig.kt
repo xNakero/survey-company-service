@@ -44,8 +44,7 @@ open class WebSecurityConfig(
                     "survey/participants-count"
                 ).authenticated()
                 .antMatchers(
-                    "personal-profile"
-                ).hasRole(PARTICIPANT.toString())
+                    "personal-profile").hasRole(PARTICIPANT.toString())
                 .antMatchers(
                     "survey",
                     "survey/participants-count"

@@ -1,9 +1,5 @@
 package pl.wat.surveycompanyservice.domain.profile
 
-import org.elasticsearch.action.DocWriteResponse.Result
-import org.elasticsearch.action.DocWriteResponse.Result.NOOP
-import org.elasticsearch.action.DocWriteResponse.Result.NOT_FOUND
-import org.elasticsearch.action.DocWriteResponse.Result.UPDATED
 import org.springframework.stereotype.Service
 import pl.wat.surveycompanyservice.api.BasicInformation
 import pl.wat.surveycompanyservice.api.Demographics

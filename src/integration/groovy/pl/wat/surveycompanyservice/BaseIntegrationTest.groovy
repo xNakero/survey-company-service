@@ -5,6 +5,10 @@ import groovy.transform.CompileStatic
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
+import org.elasticsearch.ElasticsearchException
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
+import org.elasticsearch.action.support.master.AcknowledgedResponse
+import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,6 +22,7 @@ import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfig
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories
 import org.springframework.data.mongodb.core.MongoOperations
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.MongoDBContainer
@@ -28,7 +33,10 @@ import pl.wat.surveycompanyservice.domain.profile.ElasticPersonalProfile
 import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.role.Role
 import pl.wat.surveycompanyservice.domain.role.RoleRepository
+import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
 import pl.wat.surveycompanyservice.domain.user.UserRepository
+import pl.wat.surveycompanyservice.infrastructure.repository.ElasticPersonalProfileRepository
+import pl.wat.surveycompanyservice.infrastructure.repository.MongoSurveyRepository
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
@@ -37,6 +45,7 @@ import java.time.Duration
 import java.time.LocalDate
 
 import static java.util.stream.Collectors.toList
+import static org.elasticsearch.client.RequestOptions.DEFAULT
 import static org.springframework.http.HttpHeaders.AUTHORIZATION
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.loginRequest
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.participantRegistrationRequest
@@ -74,7 +83,16 @@ class BaseIntegrationTest extends Specification {
     ElasticsearchRestTemplate elasticsearchRestTemplate
 
     @Autowired
+    RestHighLevelClient restHighLevelClient
+
+    @Autowired
     ObjectMapper objectMapper
+
+    @Autowired
+    ElasticPersonalProfileRepository elasticPersonalProfileRepository
+
+    @Autowired
+    MongoSurveyRepository mongoSurveyRepository
 
     @Shared
     private static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:latest")
@@ -105,7 +123,9 @@ class BaseIntegrationTest extends Specification {
         restClient = new RESTClient("http://localhost:$port", ContentType.JSON)
         restClient.handler.failure = restClient.handler.success
 
+        mongoOperations.remove(new Query(), MongoSurvey.class)
         clearUsersDbs()
+        clearPersonalProfiles()
         setupUsersDbs()
 
         clock.reset()
@@ -136,6 +156,15 @@ class BaseIntegrationTest extends Specification {
         roleRepository.deleteAll()
 
         userIds.forEach {elasticsearchRestTemplate.delete(it, ElasticPersonalProfile.class)}
+    }
+
+    private void clearPersonalProfiles() {
+        DeleteIndexRequest request = new DeleteIndexRequest("personal_profile");
+        try {
+            AcknowledgedResponse deleteIndexResponse = restHighLevelClient.indices().delete(request, DEFAULT);
+        } catch (ElasticsearchException e) {
+            e.printStackTrace()
+        }
     }
 
     private void stubUser(AppRole role, Map params = [:]) {

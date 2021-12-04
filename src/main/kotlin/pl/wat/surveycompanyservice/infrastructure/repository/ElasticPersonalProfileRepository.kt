@@ -126,7 +126,7 @@ class ElasticPersonalProfileRepository(
         searchRequest.source(searchSourceBuilder)
 
         val result = client.search(searchRequest, DEFAULT).hits
-        return result.map { it.toParticipantId() }
+        return result.map { it.id }
     }
 
     private fun PersonalProfile.toJson(): String {
@@ -153,9 +153,6 @@ class ElasticPersonalProfileRepository(
 
     private fun SearchHit.toElasticPersonalProfile(): PersonalProfileSearchResult =
         objectMapper.readValue(this.sourceAsString, PersonalProfileSearchResult::class.java)
-
-    private fun SearchHit.toParticipantId(): String =
-        objectMapper.readValue(this.sourceAsString, ElasticPersonalProfile::class.java).participantId
 
     companion object {
         const val ID = "_id"

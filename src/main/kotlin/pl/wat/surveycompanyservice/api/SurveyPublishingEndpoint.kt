@@ -1,8 +1,11 @@
 package pl.wat.surveycompanyservice.api
 
+import org.hibernate.validator.constraints.Length
+import org.hibernate.validator.constraints.URL
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,6 +15,9 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.survey.SurveyFacade
 import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.shared.ResearcherId
+import javax.validation.Valid
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
 
 @RestController
 @RequestMapping("/survey")
@@ -23,29 +29,30 @@ class SurveyPublishingEndpoint(
     @ResponseStatus(CREATED)
     fun postSurvey(
         @AuthenticationPrincipal user: AppUser,
-        @RequestBody request: SurveyToPostDto
+        @Valid @RequestBody request: SurveyToPostDto
     ) = surveyFacade.saveSurvey(request, ResearcherId(user.userId.toString()))
 
     @PostMapping("/participants-count")
     @ResponseStatus(OK)
     fun getNumberOfEligibleParticipants(
-        @RequestBody request: PersonalProfileQueryParams
+        @Valid @RequestBody request: PersonalProfileQueryParams
     ): EligibleUsersDto =
         EligibleUsersDto(surveyFacade.getNumberOfEligibleParticipants(request))
-
 }
 
 data class SurveyToPostDto(
-    val surveyParams: SurveyParamsDto,
-    val queryParams: PersonalProfileQueryParams
+    @field:Valid val surveyParams: SurveyParamsDto,
+    @field:Valid val queryParams: PersonalProfileQueryParams
 )
 
 data class SurveyParamsDto(
-    val title: String,
-    val url: String,
-    val timeToCompleteInSeconds: Int,
-    val description: String,
-    val spots: Int
+    @field:Length(min = 3, max = 100, message = "Length of title has to be between 3 and 100 characters.") val title: String,
+    @field:URL(message = "url field is not a url.") val url: String,
+    @field:Min(value = 300, message = "Minimum time to complete has to be at least 5 minutes.")
+    @field:Max(value = 10800, message = "Maximum time to complete has to be no longer than 3 hours.") val
+    timeToCompleteInSeconds: Int,
+    @field:Length(min = 100, max = 2000, message = "Description has to be between 100 and 2000 characters.") val description: String,
+    @field:Min(value = 1, message = "There is at least one spot required for a survey.") val spots: Int
 )
 
 data class EligibleUsersDto(

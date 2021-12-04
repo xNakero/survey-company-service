@@ -16,7 +16,6 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.MONTHLY_INCOME
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_USERNAME
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PASSWORD
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.POLITICAL_SIDE
-import static pl.wat.surveycompanyservice.IntegrationTestBuilders.RESEARCHER_USERNAME
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.personalProfileDto
 
 class PersonalProfileEndpointIntTest extends BaseIntegrationTest {

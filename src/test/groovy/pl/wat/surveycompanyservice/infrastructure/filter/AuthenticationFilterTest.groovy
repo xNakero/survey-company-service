@@ -3,6 +3,7 @@ package pl.wat.surveycompanyservice.infrastructure.filter
 import com.auth0.jwt.exceptions.JWTVerificationException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import pl.wat.surveycompanyservice.BaseUnitTest
+import pl.wat.surveycompanyservice.TestBuilders
 import pl.wat.surveycompanyservice.domain.role.Role
 import pl.wat.surveycompanyservice.domain.user.AppUser
 
@@ -14,6 +15,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 import static pl.wat.surveycompanyservice.TestBuilders.PASSWORD
 import static pl.wat.surveycompanyservice.TestBuilders.USERNAME
+import static pl.wat.surveycompanyservice.TestBuilders.appUser
 import static pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
 
 class AuthenticationFilterTest extends BaseUnitTest {
@@ -27,12 +29,7 @@ class AuthenticationFilterTest extends BaseUnitTest {
             String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyOEBnbWFpbC5jb20iLCJyb2xlcyI6IklOVEVS" +
                     "VklFV0VFIiwiaXNzIjoic3VydmV5LWFwcCIsImV4cCI6MTYzNTkwMjA3MiwiaWF0IjoxNjM1ODE1NjcyfQ.rF1o6Z4jaJtj" +
                     "WR41jokD_t3tD5fSWHu14CuUjif3pno5xXyGh1s3G343U7pWCZRM34idD_mKOiYAP-bJQWG4pQ"
-            AppUser user = new AppUser(
-                    1,
-                    USERNAME,
-                    PASSWORD,
-                    [new Role(1L, PARTICIPANT.toString(), [] as Set)] as Set
-            )
+            AppUser user = appUser()
             request.getHeader(AUTHORIZATION) >> token
             tokenService.authenticate(token) >> new UsernamePasswordAuthenticationToken(
                     user,

@@ -7,6 +7,8 @@ import pl.wat.surveycompanyservice.api.Demographics
 import pl.wat.surveycompanyservice.api.Education
 import pl.wat.surveycompanyservice.api.PersonalProfileDto
 import pl.wat.surveycompanyservice.api.PoliticalViews
+import pl.wat.surveycompanyservice.api.SurveyParamsDto
+import pl.wat.surveycompanyservice.api.SurveyToPostDto
 import pl.wat.surveycompanyservice.api.Work
 import pl.wat.surveycompanyservice.domain.profile.CivilStatus
 import pl.wat.surveycompanyservice.domain.profile.Country
@@ -44,15 +46,19 @@ class IntegrationTestBuilders {
     public static final String POLITICAL_SIDE = 'CENTRE'
     public static final String PARTICIPANT_ID = '1'
 
-    public static String SURVEY_ID = '61cb2fbf-e83a-4fd2-9d7b-879686653699'
-    public static String RESEARCHER_ID = '2'
-    public static String TITLE = 'Title'
-    public static String URL = 'http://survey.com'
-    public static int TIME_TO_COMPLETE_IN_SECONDS = 3600
-    public static String DESCRIPTION = 'Description'
-    public static int SPOTS_TOTAL = 12
-    public static int SPOTS_TAKEN = 0
-    public static String COMPLETION_CODE = 'SQVQ3RBFSKSJ0X9UTWXJSPP306QO5C2L'
+    public static final String SURVEY_ID = '61cb2fbf-e83a-4fd2-9d7b-879686653699'
+    public static final String RESEARCHER_ID = '2'
+    public static final String TITLE = 'Title'
+    public static final String URL = 'http://survey.com'
+    public static final int TIME_TO_COMPLETE_IN_SECONDS = 3600
+    public static final String DESCRIPTION = 'Lorem Ipsum dolor sit amet, consectetur adipiscing elit, ' +
+            'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+            'quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ' +
+            'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. ' +
+            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    public static final int SPOTS_TOTAL = 12
+    public static final int SPOTS_TAKEN = 0
+    public static final String COMPLETION_CODE = 'SQVQ3RBFSKSJ0X9UTWXJSPP306QO5C2L'
 
     @Autowired
     ObjectMapper objectMapper
@@ -203,6 +209,34 @@ class IntegrationTestBuilders {
                 spotsTotal,
                 spotsTaken,
                 completionCode
+        )
+    }
+
+    static SurveyParamsDto surveyParamsDto(Map params = [:]) {
+        String title = params.title as String ?: TITLE
+        String url = params.url as String ?: URL
+        Integer timeToCompleteInSeconds = params.timeToCompleteInSeconds as Integer ?: TIME_TO_COMPLETE_IN_SECONDS
+        String description = params.description as String ?: DESCRIPTION
+        Integer spots = params.spots as Integer ?: SPOTS_TOTAL
+
+        return new SurveyParamsDto(
+                title,
+                url,
+                timeToCompleteInSeconds,
+                description,
+                spots
+        )
+    }
+
+    static SurveyToPostDto surveyToPostDto(Map params = [:]) {
+        SurveyParamsDto surveyParamsDto = params.surveyParamsDto ? surveyParamsDto(params.surveyParamsDto as Map) : surveyParamsDto()
+        PersonalProfileQueryParams personalProfileQueryParams = params.personalProfileQueryParams ?
+                personalProfileQueryParams(params.personalProfileQueryParams as Map) :
+                personalProfileQueryParams()
+
+        return new SurveyToPostDto(
+                surveyParamsDto,
+                personalProfileQueryParams
         )
     }
 }

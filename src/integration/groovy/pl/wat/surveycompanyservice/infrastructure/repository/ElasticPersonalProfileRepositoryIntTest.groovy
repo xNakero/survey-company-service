@@ -24,9 +24,6 @@ import static pl.wat.surveycompanyservice.domain.profile.PoliticalSide.RIGHT
 
 class ElasticPersonalProfileRepositoryIntTest extends BaseIntegrationTest {
 
-    @Autowired
-    ElasticPersonalProfileRepository elasticPersonalProfileRepository
-
     def 'should save personalProfile'() {
         given:
             PersonalProfile personalProfile = personalProfile()
@@ -198,12 +195,17 @@ class ElasticPersonalProfileRepositoryIntTest extends BaseIntegrationTest {
                     civilStatus: 'SINGLE',
                     industry: 'IT'
             ])
+            PersonalProfileQueryParams queryParams6 = personalProfileQueryParams([
+                    youngerOrEqualThan: 20,
+                    olderOrEqualThan: 22
+            ])
         when:
             List eligibleParticipantIds1 = elasticPersonalProfileRepository.findEligibleParticipantIds(queryParams1)
             List eligibleParticipantIds2 = elasticPersonalProfileRepository.findEligibleParticipantIds(queryParams2)
             List eligibleParticipantIds3 = elasticPersonalProfileRepository.findEligibleParticipantIds(queryParams3)
             List eligibleParticipantIds4 = elasticPersonalProfileRepository.findEligibleParticipantIds(queryParams4)
             List eligibleParticipantIds5 = elasticPersonalProfileRepository.findEligibleParticipantIds(queryParams5)
+            List eligibleParticipantIds6 = elasticPersonalProfileRepository.findEligibleParticipantIds(queryParams6)
         then:
             eligibleParticipantIds1.contains(personalProfile1.participantId.raw)
             eligibleParticipantIds2.containsAll([
@@ -214,5 +216,6 @@ class ElasticPersonalProfileRepositoryIntTest extends BaseIntegrationTest {
             eligibleParticipantIds3.contains(personalProfile2.participantId.raw)
             eligibleParticipantIds4.contains(personalProfile3.participantId.raw)
             eligibleParticipantIds5.contains(personalProfile2.participantId.raw)
+            eligibleParticipantIds6 == []
     }
 }
