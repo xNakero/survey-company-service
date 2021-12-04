@@ -1,4 +1,7 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
+
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     driver-class-name: org.postgresql.Driver
@@ -19,11 +22,12 @@ spring:
       connection-timeout: 1s
       uris: localhost:9200
 
-  data:
-    mongodb:
-      authentication-database: admin
-      username: username
-      password: password
+#  data:
+#    mongodb:
+#      authentication-database: admin
+#      username: username
+#      password: password
+#      uri: mongodb://localhost:27017
 
 server:
   port: 8080

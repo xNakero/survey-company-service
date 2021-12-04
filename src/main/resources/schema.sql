@@ -17,7 +17,7 @@ create table user_role (
     primary key (user_id, role_id)
 );
 
-insert into role(role_id, name) values
-    (1, 'INTERVIEWER'),
-    (2, 'INTERVIEWEE');
+-- insert into role(role_id, name) values
+--     (1, 'RESEARCHER'),
+--     (2, 'PARTICIPANT');
 

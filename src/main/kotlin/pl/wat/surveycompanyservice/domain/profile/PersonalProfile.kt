@@ -7,13 +7,13 @@ import org.springframework.data.elasticsearch.annotations.FieldType
 import org.springframework.data.elasticsearch.annotations.FieldType.Date
 import org.springframework.data.elasticsearch.annotations.FieldType.Integer
 import org.springframework.data.elasticsearch.annotations.FieldType.Text
+import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.UserId
-import java.time.Instant
 import java.time.LocalDate
 
 
 data class PersonalProfile(
-    val userId: UserId,
+    val participantId: ParticipantId,
     val dateOfBirth: LocalDate?,
     val civilStatus: CivilStatus?,
     val countryOfBirth: Country?,
@@ -29,29 +29,29 @@ data class PersonalProfile(
     val politicalSide: PoliticalSide?
 ) {
 
-    fun toMongoPersonalProfile(): ElasticPersonalProfile = ElasticPersonalProfile(
-        userId = userId.raw,
+    fun toElasticPersonalProfile(): ElasticPersonalProfile = ElasticPersonalProfile(
+        participantId = participantId.raw,
         dateOfBirth = dateOfBirth,
-        civilStatus = civilStatus.toString(),
-        countryOfBirth = countryOfBirth.toString(),
-        nationality = nationality.toString(),
-        currentCountry = currentCountry.toString(),
-        firstLanguage = firstLanguage.toString(),
-        highestEducationLevelAchieved = highestEducationLevelAchieved.toString(),
+        civilStatus = civilStatus?.toString(),
+        countryOfBirth = countryOfBirth?.toString(),
+        nationality = nationality?.toString(),
+        currentCountry = currentCountry?.toString(),
+        firstLanguage = firstLanguage?.toString(),
+        highestEducationLevelAchieved = highestEducationLevelAchieved?.toString(),
         isStudent = isStudent,
         monthlyIncome = monthlyIncome,
-        employmentStatus = employmentStatus.toString(),
-        formOfEmployment = formOfEmployment.toString(),
-        industry = industry.toString(),
-        politicalSide = politicalSide.toString()
+        employmentStatus = employmentStatus?.toString(),
+        formOfEmployment = formOfEmployment?.toString(),
+        industry = industry?.toString(),
+        politicalSide = politicalSide?.toString()
     )
 }
 
 @Document(indexName = "personal_profile")
 data class ElasticPersonalProfile(
-    @Id val userId: String,
-    @field:Field(type = Text) val dateOfBirth: LocalDate?,
-    @field:Field(type = Date) val civilStatus: String?,
+    @Id val participantId: String,
+    @field:Field(type = Date) val dateOfBirth: LocalDate?,
+    @field:Field(type = Text) val civilStatus: String?,
     @field:Field(type = Text) val countryOfBirth: String?,
     @field:Field(type = Text) val nationality: String?,
     @field:Field(type = Text) val currentCountry: String?,
@@ -65,7 +65,7 @@ data class ElasticPersonalProfile(
     @field:Field(type = Text) val politicalSide: String?
 ) {
     fun toPersonalProfile(): PersonalProfile = PersonalProfile(
-        userId = UserId(userId),
+        participantId = ParticipantId(participantId),
         dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.let { CivilStatus.valueOf(it) },
         countryOfBirth = countryOfBirth?.let { Country.valueOf(it) },
@@ -91,7 +91,7 @@ enum class Country {
 }
 
 enum class Language {
-    POLISH, GERMAN, ENGLISH_UK
+    POLISH, GERMAN, ENGLISH
 }
 
 enum class EmploymentStatus {

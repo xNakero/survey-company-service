@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus.OK
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,8 +21,7 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileFacade
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.infrastructure.validator.Enum
-import pl.wat.surveycompanyservice.shared.UserId
-import java.time.Instant
+import pl.wat.surveycompanyservice.shared.ParticipantId
 import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.Min
@@ -33,7 +31,6 @@ import javax.validation.constraints.Min
 class PersonalProfileEndpoint(
     private val personalProfileFacade: PersonalProfileFacade
 ) {
-
     @PutMapping
     @ResponseStatus(OK)
     fun update(
@@ -42,16 +39,10 @@ class PersonalProfileEndpoint(
     ): PersonalProfileDto =
         personalProfileFacade.updateProfile(request.toPersonalProfile(user.userId.toString()))
 
-
-    @PostMapping("/clear")
-    @ResponseStatus(OK)
-    fun clear(@AuthenticationPrincipal user: AppUser) =
-        personalProfileFacade.clearProfileData(UserId(user.userId.toString()))
-
     @GetMapping
     @ResponseStatus(OK)
     fun get(@AuthenticationPrincipal user: AppUser): PersonalProfileDto =
-        personalProfileFacade.getProfileData(UserId(user.userId.toString()))
+        personalProfileFacade.getProfileData(ParticipantId(user.userId.toString()))
 }
 
 @Validated
@@ -63,7 +54,7 @@ data class PersonalProfileDto(
     @field:Valid val politicalViews: PoliticalViews
 ) {
     fun toPersonalProfile(userId: String): PersonalProfile = PersonalProfile(
-        userId = UserId(userId),
+        participantId = ParticipantId(userId),
         dateOfBirth = basicInformation.dateOfBirth,
         civilStatus = basicInformation.civilStatus?.let { CivilStatus.valueOf(it) },
         countryOfBirth = demographics.countryOfBirth?.let { Country.valueOf(it) },
@@ -86,9 +77,9 @@ data class BasicInformation(
 )
 
 data class Demographics(
-    @field:Enum(Country::class, message = "There is no such country.") val countryOfBirth: String?,
-    @field:Enum(Country::class, message = "There is no such country.") val nationality: String?,
-    @field:Enum(Country::class, message = "There is no such country.") val currentCountry: String?,
+    @field:Enum(Country::class, message = "There is no such country for countryOBirth.") val countryOfBirth: String?,
+    @field:Enum(Country::class, message = "There is no such country for nationality.") val nationality: String?,
+    @field:Enum(Country::class, message = "There is no such country for currentCountry.") val currentCountry: String?,
     @field:Enum(Language::class, message = "There is no such language.") val firstLanguage: String?
 )
 

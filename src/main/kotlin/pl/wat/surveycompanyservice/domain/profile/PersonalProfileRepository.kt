@@ -1,11 +1,11 @@
 package pl.wat.surveycompanyservice.domain.profile
 
 import org.elasticsearch.action.DocWriteResponse.Result
-import pl.wat.surveycompanyservice.shared.UserId
+import pl.wat.surveycompanyservice.shared.ParticipantId
 
 interface PersonalProfileRepository {
-    fun createEmptyProfile(personalProfile: PersonalProfile)
-    fun updateProfile(personalProfile: PersonalProfile): Result
-    fun getProfile(userId: UserId): PersonalProfile
+    fun save(personalProfile: PersonalProfile)
+    fun updateProfile(personalProfile: PersonalProfile)
+    fun findProfile(participantId: ParticipantId): PersonalProfile
     fun findEligibleParticipantIds(queryParams: PersonalProfileQueryParams): List<String>
 }

@@ -17,6 +17,7 @@ class SurveyFacade(
 ) {
     fun saveSurvey(surveyDto: SurveyToPostDto, researcherId: ResearcherId) {
         val eligibleUsers = personalProfileService.findEligibleParticipantIds(surveyDto.queryParams)
+            .also { if (it.isEmpty()) throw NoEligibleParticipantsException("There are no eligible participants.") }
         val completionCode = completionCodeFactory.generateCode(surveyProperties.codeLength)
         val survey = surveyDto.toSurvey(researcherId, eligibleUsers, completionCode)
         surveyService.saveSurvey(survey)
@@ -47,3 +48,5 @@ fun SurveyToPostDto.toSurvey(
 
 fun determineTotalSpots(spots: Int, eligibleParticipantsIds: List<String>): Int =
     if (spots > eligibleParticipantsIds.size) eligibleParticipantsIds.size else spots
+
+class NoEligibleParticipantsException(message: String?) : RuntimeException(message)

@@ -22,7 +22,7 @@ class AppUser(
     private val password: String,
     @ManyToMany(cascade = [ALL], fetch = EAGER)
     @JoinTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")], inverseJoinColumns = [JoinColumn(name = "role_id")])
-    private val roles: MutableSet<Role>
+    val roles: MutableSet<Role>
     ) : UserDetails {
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
