@@ -1,6 +1,7 @@
 package pl.wat.surveycompanyservice.infrastructure.repository
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DuplicateKeyException
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
 import pl.wat.surveycompanyservice.domain.survey.Survey
@@ -22,7 +23,7 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
             }
     }
 
-    def 'should not save if a survey with the same id exists and not throw DuplicateKeyException'() {
+    def 'should not save if a survey with the same id exists and throw DuplicateKeyException'() {
         given:
             Survey survey1 = survey()
             Survey survey2 = survey(researcherId: '123')
@@ -30,6 +31,7 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
             mongoSurveyRepository.saveSurvey(survey1)
             mongoSurveyRepository.saveSurvey(survey2)
         then:
+            thrown(DuplicateKeyException)
             mongoOperations.findAll(MongoSurvey.class).size() == 1
     }
 }

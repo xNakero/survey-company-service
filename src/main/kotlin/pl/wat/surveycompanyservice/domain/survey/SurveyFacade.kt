@@ -6,6 +6,7 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileService
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
+import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 import java.util.*
 
 @Component
@@ -26,6 +27,11 @@ class SurveyFacade(
     fun getNumberOfEligibleParticipants(request: PersonalProfileQueryParams): Int =
         personalProfileService.findEligibleParticipantIds(request).size
 
+    fun findSurvey(surveyId: SurveyId): Survey =
+        surveyService.findSurvey(surveyId)
+
+    fun incrementSpotsTaken(surveyId: SurveyId, surveyParticipationId: SurveyParticipationId): Survey =
+        surveyService.incrementSpotsTaken(surveyId, surveyParticipationId)
 }
 
 fun SurveyToPostDto.toSurvey(
@@ -35,7 +41,7 @@ fun SurveyToPostDto.toSurvey(
 ): Survey = Survey(
     id = SurveyId(UUID.randomUUID().toString()),
     researcherId = researcherId,
-    participantIds = emptyList(),
+    participationIds = emptyList(),
     eligibleParticipantsIds = eligibleParticipantsIds,
     title = surveyParams.title,
     url = surveyParams.url,

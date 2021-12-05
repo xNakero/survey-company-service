@@ -19,7 +19,7 @@ import static pl.wat.surveycompanyservice.TestBuilders.PARTICIPANT_ID
 import static pl.wat.surveycompanyservice.TestBuilders.POLITICAL_SIDE
 import static pl.wat.surveycompanyservice.TestBuilders.personalProfile
 
-class PersonalProfileFacadeTest extends BaseUnitTest{
+class PersonalProfileFacadeTest extends BaseUnitTest {
 
     def 'should save empty personal profile'() {
         given:

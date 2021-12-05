@@ -187,7 +187,7 @@ class IntegrationTestBuilders {
     static Survey survey(Map params = [:]) {
         SurveyId surveyId = params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
         ResearcherId researcherId = params.researcherId != null ? new ResearcherId(params.researcherId) : new ResearcherId(RESEARCHER_ID)
-        List participantIds = params.participantsIds as List ?: []
+        List participationIds = params.participationIds as List ?: []
         List eligibleParticipantIds = params.eligibleParticipantIds as List ?: []
         String title = params.title as String ?: TITLE
         String url = params.url as String ?: URL
@@ -200,7 +200,7 @@ class IntegrationTestBuilders {
         return new Survey(
                 surveyId,
                 researcherId,
-                participantIds,
+                participationIds,
                 eligibleParticipantIds,
                 title,
                 url,
