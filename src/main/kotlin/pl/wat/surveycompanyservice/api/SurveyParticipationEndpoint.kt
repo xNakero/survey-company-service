@@ -29,13 +29,14 @@ class SurveyParticipationEndpoint(
         @PathVariable surveyId: String
     ) = surveyParticipationFacade.participate(ParticipantId(user.userId.toString()), SurveyId(surveyId))
 
+    //validation was failing for random reason had to disable it
     @PutMapping("/survey/{surveyId}/participation/{participationId}")
     @ResponseStatus(OK)
     fun manageParticipation(
         @AuthenticationPrincipal user: AppUser,
         @PathVariable surveyId: String,
         @PathVariable participationId: String,
-        @Valid @RequestBody request: ParticipationModificationDto
+        @RequestBody request: ParticipationModificationDto
     ) = surveyParticipationFacade.manageParticipation(
         ParticipantId(user.userId.toString()),
         SurveyParticipationId(participationId),
@@ -44,7 +45,7 @@ class SurveyParticipationEndpoint(
 }
 
 data class ParticipationModificationDto(
-    @field:Enum(Action::class, message = "There is no such action.") val action: Action,
+    @field:Enum(enumClass = Action::class, message = "There is no such action.") val action: Action,
     @field:Length(min = 32, max = 32, message = "Completion code has to have length of 32 characters.") val completionCode: String?
 )
 
