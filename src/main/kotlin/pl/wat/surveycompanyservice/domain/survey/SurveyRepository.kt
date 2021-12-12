@@ -6,5 +6,5 @@ import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 interface SurveyRepository {
     fun saveSurvey(survey: Survey)
     fun find(surveyId: SurveyId): Survey
-    fun saveParticipation(surveyId: SurveyId, spotsToUpdate: Int, surveyParticipationId: SurveyParticipationId)
+    fun saveParticipationToSurvey(surveyId: SurveyId, spotsToUpdate: Int, surveyParticipationId: SurveyParticipationId)
 }

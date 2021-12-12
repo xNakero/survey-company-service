@@ -18,6 +18,7 @@ import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 class MongoSurveyParticipationRepository(
     val mongoOperations: MongoOperations
 ): SurveyParticipationRepository {
+
     override fun insert(surveyParticipation: SurveyParticipation) {
         mongoOperations.insert(surveyParticipation.toMongoSurveyParticipation())
     }
@@ -25,10 +26,7 @@ class MongoSurveyParticipationRepository(
     override fun update(surveyParticipationId: SurveyParticipationId, surveyStatus: SurveyStatus, completionCode: String?) {
         val query = Query.query(Criteria.where(ID).`is`(surveyParticipationId.raw))
         val update = Update().set(STATUS, surveyStatus.toString()).set(COMPLETION_CODE, completionCode)
-        val result = mongoOperations.updateFirst(query, update, MongoSurveyParticipation::class.java)
-        if (!result.wasAcknowledged()) {
-            throw SurveyParticipationNotUpdatedException("Survey participation with id: ${surveyParticipationId.raw} was not updated.")
-        }
+        mongoOperations.updateFirst(query, update, MongoSurveyParticipation::class.java)
     }
 
     override fun findByParticipantId(participantId: ParticipantId): List<SurveyParticipation> {

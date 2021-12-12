@@ -32,7 +32,7 @@ class MongoSurveyRepository(
         return surveys[0].toSurvey()
     }
 
-    override fun saveParticipation(
+    override fun saveParticipationToSurvey(
         surveyId: SurveyId,
         spotsToUpdate: Int,
         surveyParticipationId: SurveyParticipationId

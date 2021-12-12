@@ -21,10 +21,14 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.domain.survey.Survey
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
+import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
+import java.time.Instant
 import java.time.LocalDate
 
 class IntegrationTestBuilders {
@@ -59,6 +63,11 @@ class IntegrationTestBuilders {
     public static final int SPOTS_TOTAL = 12
     public static final int SPOTS_TAKEN = 0
     public static final String COMPLETION_CODE = 'SQVQ3RBFSKSJ0X9UTWXJSPP306QO5C2L'
+    public static final String SURVEY_PARTICIPATION_ID = '1-1'
+    public static final String SURVEY_STATUS = 'IN_PROGRESS'
+    public static final Instant STARTED_AT = Instant.parse('2021-11-11T10:00:00.000Z')
+    public static final Instant HAS_TO_FINISH_UNTIL = Instant.parse('2021-11-11T10:20:00.000Z')
+
 
     @Autowired
     ObjectMapper objectMapper
@@ -237,6 +246,27 @@ class IntegrationTestBuilders {
         return new SurveyToPostDto(
                 surveyParamsDto,
                 personalProfileQueryParams
+        )
+    }
+
+    static SurveyParticipation surveyParticipation(Map params = [:]) {
+        SurveyParticipationId surveyParticipationId = params.surveyParticipationId != null?
+                new SurveyParticipationId(params.surveyParticipationId) : new SurveyParticipationId(SURVEY_PARTICIPATION_ID)
+        ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
+        SurveyId surveyId = params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
+        SurveyStatus status = params.status as SurveyStatus ?: SURVEY_STATUS as SurveyStatus
+        Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
+        Instant hasToFinishUntil = params.hasToFinishUntil ? Instant.parse(params.hasToFinishUntil) : HAS_TO_FINISH_UNTIL
+        String completionCode = params.completionCode
+
+        return new SurveyParticipation(
+                surveyParticipationId,
+                participantId,
+                surveyId,
+                status,
+                startedAt,
+                hasToFinishUntil,
+                completionCode
         )
     }
 }

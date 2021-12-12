@@ -19,6 +19,7 @@ import pl.wat.surveycompanyservice.domain.surveyparticipation.AlreadyParticipate
 import pl.wat.surveycompanyservice.domain.surveyparticipation.NoCompletionCodeException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.NoFreeSpotsException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationNotInProgressException
+import pl.wat.surveycompanyservice.domain.surveyparticipation.UnqualifiedParticipantException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.WrongParticipantException
 import pl.wat.surveycompanyservice.domain.user.RoleNotFoundException
 import pl.wat.surveycompanyservice.domain.user.UserAlreadyExistsException
@@ -157,6 +158,15 @@ class ExceptionHandler {
     @ExceptionHandler(WrongParticipantException::class)
     @ResponseStatus(FORBIDDEN)
     fun wrongParticipantExceptionHandler(exception: WrongParticipantException) =
+        AppException(
+            httpStatus = FORBIDDEN,
+            statusCode = FORBIDDEN.value(),
+            errors = listOf(exception.message)
+        )
+
+    @ExceptionHandler(UnqualifiedParticipantException::class)
+    @ResponseStatus(CONFLICT)
+    fun unqualifiedParticipantExceptionHandler(exception: UnqualifiedParticipantException) =
         AppException(
             httpStatus = FORBIDDEN,
             statusCode = FORBIDDEN.value(),

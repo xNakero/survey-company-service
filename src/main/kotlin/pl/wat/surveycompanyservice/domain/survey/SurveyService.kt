@@ -18,7 +18,7 @@ class SurveyService(
 
     fun incrementSpotsTaken(surveyId: SurveyId, surveyParticipationId: SurveyParticipationId): Survey {
         val survey = surveyRepository.find(surveyId)
-        surveyRepository.saveParticipation(surveyId, survey.spotsTaken + 1, surveyParticipationId)
+        surveyRepository.saveParticipationToSurvey(surveyId, survey.spotsTaken + 1, surveyParticipationId)
         return survey
     }
 }

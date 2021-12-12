@@ -15,6 +15,7 @@ import pl.wat.surveycompanyservice.infrastructure.validator.Enum
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
+import javax.validation.Valid
 
 @RestController
 class SurveyParticipationEndpoint(
@@ -34,7 +35,7 @@ class SurveyParticipationEndpoint(
         @AuthenticationPrincipal user: AppUser,
         @PathVariable surveyId: String,
         @PathVariable participationId: String,
-        @RequestBody request: ParticipationModificationDto
+        @Valid @RequestBody request: ParticipationModificationDto
     ) = surveyParticipationFacade.manageParticipation(
         ParticipantId(user.userId.toString()),
         SurveyParticipationId(participationId),
@@ -44,8 +45,7 @@ class SurveyParticipationEndpoint(
 
 data class ParticipationModificationDto(
     @field:Enum(Action::class, message = "There is no such action.") val action: Action,
-    @field:Length(min = 32, max = 32, message = "Completion code has to have length of 32 characters.")
-    val completionCode: String?
+    @field:Length(min = 32, max = 32, message = "Completion code has to have length of 32 characters.") val completionCode: String?
 )
 
 enum class Action {

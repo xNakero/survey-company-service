@@ -28,7 +28,7 @@ class InMemorySurveyRepository implements SurveyRepository {
     }
 
     @Override
-    void saveParticipation(
+    void saveParticipationToSurvey(
             SurveyId surveyId,
             int spotsToUpdate,
             SurveyParticipationId surveyParticipationId

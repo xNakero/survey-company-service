@@ -24,7 +24,7 @@ class SurveyParticipationFacade(
 
         val survey = surveyFacade.findSurvey(surveyId)
         if (!survey.eligibleParticipantsIds.contains(participantId.raw)) {
-            throw UnqualifiedParticipantException("Participant: ${participantId.raw} did not qualify for the survey: ${surveyId.raw}")
+            throw UnqualifiedParticipantException("Participant with id: ${participantId.raw} did not qualify for the survey: ${surveyId.raw}")
         }
         if (!survey.hasFreeSpots()) {
             throw NoFreeSpotsException("There are no free spots for survey withId: ${surveyId.raw}.")
