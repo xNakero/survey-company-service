@@ -8,7 +8,7 @@ import pl.wat.surveycompanyservice.shared.SurveyId
 data class Survey(
     val id: SurveyId,
     val researcherId: ResearcherId,
-    val participantIds: List<String>,
+    val participationIds: List<String>,
     val eligibleParticipantsIds: List<String>,
     val title: String,
     val url: String,
@@ -23,7 +23,7 @@ data class Survey(
     fun toMongoSurvey(): MongoSurvey = MongoSurvey(
         id = id.raw,
         researcherId = researcherId.raw,
-        participantIds = participantIds,
+        participationIds = participationIds,
         eligibleParticipantsIds = eligibleParticipantsIds,
         title = title,
         url = url,
@@ -39,7 +39,7 @@ data class Survey(
 data class MongoSurvey(
     @Id val id: String,
     val researcherId: String,
-    val participantIds: List<String>,
+    val participationIds: List<String>,
     val eligibleParticipantsIds: List<String>,
     val title: String,
     val url: String,
@@ -52,7 +52,7 @@ data class MongoSurvey(
     fun toSurvey(): Survey = Survey(
         id = SurveyId(id),
         researcherId = ResearcherId(researcherId),
-        participantIds = participantIds,
+        participationIds = participationIds,
         eligibleParticipantsIds = eligibleParticipantsIds,
         title = title,
         url = url,

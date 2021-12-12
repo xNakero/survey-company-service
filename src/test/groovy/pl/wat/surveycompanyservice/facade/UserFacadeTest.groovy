@@ -14,7 +14,7 @@ import static pl.wat.surveycompanyservice.TestBuilders.USERNAME
 import static pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
 import static pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
 
-class UserFacadeTest extends BaseUnitTest{
+class UserFacadeTest extends BaseUnitTest {
 
     def 'should create participant account with personalProfile'() {
         given:

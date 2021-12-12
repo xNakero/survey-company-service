@@ -10,12 +10,16 @@ import pl.wat.surveycompanyservice.domain.survey.CompletionCodeFactory
 import pl.wat.surveycompanyservice.domain.survey.SurveyFacade
 import pl.wat.surveycompanyservice.domain.survey.SurveyProperties
 import pl.wat.surveycompanyservice.domain.survey.SurveyService
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationFacade
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationIdFactory
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationService
 import pl.wat.surveycompanyservice.domain.user.UserFacade
 import pl.wat.surveycompanyservice.domain.user.UserRepository
 import pl.wat.surveycompanyservice.domain.user.UserService
 import pl.wat.surveycompanyservice.domain.user.UserServiceImpl
 import pl.wat.surveycompanyservice.infrastructure.filter.AuthenticationFilter
 import pl.wat.surveycompanyservice.infrastructure.repository.InMemoryPersonalProfileRepository
+import pl.wat.surveycompanyservice.infrastructure.repository.InMemorySurveyParticipationRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.InMemorySurveyRepository
 import pl.wat.surveycompanyservice.infrastructure.token.TokenProperties
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
@@ -30,6 +34,7 @@ class BaseUnitTest extends Specification{
     protected RoleRepository roleRepository = Stub()
     protected PasswordEncoder passwordEncoder = Stub()
     protected AuthenticationManager authenticationManager = Stub()
+    protected TestClock clock = new TestClock()
     protected UserService userService = new UserService(userRepository, roleRepository, passwordEncoder, authenticationManager)
     protected TokenProperties tokenProperties = new TokenProperties()
     protected ObjectMapper objectMapper = new ObjectMapper()
@@ -37,6 +42,7 @@ class BaseUnitTest extends Specification{
     protected TokenService tokenService = new TokenService(tokenProperties, objectMapper, userServiceImpl)
     protected InMemoryPersonalProfileRepository inMemoryPersonalProfileRepository = new InMemoryPersonalProfileRepository()
     protected InMemorySurveyRepository inMemorySurveyRepository = new InMemorySurveyRepository()
+    protected InMemorySurveyParticipationRepository inMemorySurveyParticipationRepository = new InMemorySurveyParticipationRepository()
     protected PersonalProfileService personalProfileService = new PersonalProfileService(inMemoryPersonalProfileRepository)
     protected PersonalProfileFacade personalProfileFacade = new PersonalProfileFacade(personalProfileService)
     protected UserFacade userFacade = new UserFacade(userService, tokenService, personalProfileFacade)
@@ -45,8 +51,21 @@ class BaseUnitTest extends Specification{
     protected SurveyProperties surveyProperties = new SurveyProperties()
     protected SurveyFacade surveyFacade = new SurveyFacade(surveyService, personalProfileService, completionCodeFactory, surveyProperties)
     protected AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, tokenService, objectMapper)
+    protected SurveyParticipationIdFactory surveyParticipationIdFactory = new SurveyParticipationIdFactory()
+    protected SurveyParticipationService surveyParticipationService = new SurveyParticipationService(
+            inMemorySurveyParticipationRepository,
+            surveyParticipationIdFactory,
+            clock
+    )
+    protected SurveyParticipationFacade surveyParticipationFacade = new SurveyParticipationFacade(
+            surveyParticipationService,
+            surveyFacade
+    )
 
     def setup() {
         inMemoryPersonalProfileRepository.clear()
+        inMemorySurveyRepository.clear()
+        inMemorySurveyParticipationRepository.clear()
+        clock.reset()
     }
 }

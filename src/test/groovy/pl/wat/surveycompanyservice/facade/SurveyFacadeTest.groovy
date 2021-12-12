@@ -11,7 +11,7 @@ import static pl.wat.surveycompanyservice.TestBuilders.COUNTRY
 import static pl.wat.surveycompanyservice.TestBuilders.personalProfile
 import static pl.wat.surveycompanyservice.TestBuilders.personalProfileQueryParams
 
-class SurveyFacadeTest extends BaseUnitTest{
+class SurveyFacadeTest extends BaseUnitTest {
 
     def 'should save survey'() {
         given:

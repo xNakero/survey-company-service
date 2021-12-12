@@ -11,7 +11,7 @@ import pl.wat.surveycompanyservice.shared.UserId
 import java.time.LocalDate
 import java.util.concurrent.CopyOnWriteArraySet
 
-class InMemoryPersonalProfileRepository implements PersonalProfileRepository{
+class InMemoryPersonalProfileRepository implements PersonalProfileRepository {
 
     Set<PersonalProfile> personalProfiles = new CopyOnWriteArraySet<>()
 
