@@ -23,6 +23,7 @@ import pl.wat.surveycompanyservice.infrastructure.repository.InMemorySurveyParti
 import pl.wat.surveycompanyservice.infrastructure.repository.InMemorySurveyRepository
 import pl.wat.surveycompanyservice.infrastructure.token.TokenProperties
 import pl.wat.surveycompanyservice.infrastructure.token.TokenService
+import pl.wat.surveycompanyservice.scheduler.SurveyParticipationScheduler
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -42,7 +43,7 @@ class BaseUnitTest extends Specification{
     protected TokenService tokenService = new TokenService(tokenProperties, objectMapper, userServiceImpl)
     protected InMemoryPersonalProfileRepository inMemoryPersonalProfileRepository = new InMemoryPersonalProfileRepository()
     protected InMemorySurveyRepository inMemorySurveyRepository = new InMemorySurveyRepository()
-    protected InMemorySurveyParticipationRepository inMemorySurveyParticipationRepository = new InMemorySurveyParticipationRepository()
+    protected InMemorySurveyParticipationRepository inMemorySurveyParticipationRepository = new InMemorySurveyParticipationRepository(clock)
     protected PersonalProfileService personalProfileService = new PersonalProfileService(inMemoryPersonalProfileRepository)
     protected PersonalProfileFacade personalProfileFacade = new PersonalProfileFacade(personalProfileService)
     protected UserFacade userFacade = new UserFacade(userService, tokenService, personalProfileFacade)
@@ -60,6 +61,10 @@ class BaseUnitTest extends Specification{
     protected SurveyParticipationFacade surveyParticipationFacade = new SurveyParticipationFacade(
             surveyParticipationService,
             surveyFacade
+    )
+    protected SurveyParticipationScheduler surveyParticipationScheduler = new SurveyParticipationScheduler(
+            inMemorySurveyParticipationRepository,
+            clock
     )
 
     def setup() {

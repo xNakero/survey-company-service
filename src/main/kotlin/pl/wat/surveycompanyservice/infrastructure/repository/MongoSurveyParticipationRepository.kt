@@ -2,6 +2,7 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode.UNORDERED
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -11,8 +12,11 @@ import pl.wat.surveycompanyservice.domain.surveyparticipation.MongoSurveyPartici
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationRepository
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.TIMEOUT
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
+import java.time.Instant
 
 @Component
 class MongoSurveyParticipationRepository(
@@ -35,6 +39,16 @@ class MongoSurveyParticipationRepository(
             .map { it.toSurveyParticipation() }
     }
 
+    override fun finishAllUnfinishedInTime(timestamp: Instant) {
+        val query = Query.query(Criteria.where(STATUS).`is`(IN_PROGRESS.toString())
+                .and(HAS_TO_FINISH_UNTIL).lte(timestamp))
+        val update = Update.update(STATUS, TIMEOUT.toString())
+
+        mongoOperations.bulkOps(UNORDERED, MongoSurveyParticipation::class.java)
+            .updateMulti(query, update)
+            .execute()
+    }
+
     override fun find(surveyParticipationId: SurveyParticipationId): SurveyParticipation {
         val query = Query.query(Criteria.where(ID).`is`(surveyParticipationId.raw))
         val result = mongoOperations.find(query, MongoSurveyParticipation::class.java)
@@ -47,7 +61,6 @@ class MongoSurveyParticipationRepository(
         const val STATUS = "status"
         const val COMPLETION_CODE = "completionCode"
         const val PARTICIPANT_ID = "participantId"
+        const val HAS_TO_FINISH_UNTIL = "hasToFinishUntil"
     }
 }
-
-class SurveyParticipationNotUpdatedException(message: String?) : RuntimeException(message)

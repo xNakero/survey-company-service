@@ -3,6 +3,8 @@ package pl.wat.surveycompanyservice.api
 import groovyx.net.http.HttpResponseDecorator
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.surveyparticipation.MongoSurveyParticipation
+import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import spock.lang.Ignore
 import spock.lang.Unroll
 
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.COMPLETION_CODE
@@ -15,7 +17,6 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
 import static pl.wat.surveycompanyservice.api.Action.CANCEL
 import static pl.wat.surveycompanyservice.api.Action.COMPLETE
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.FINISHED
 
 class SurveyParticipationEndpointIntTest extends BaseIntegrationTest{
 
@@ -117,7 +118,7 @@ class SurveyParticipationEndpointIntTest extends BaseIntegrationTest{
             String participantId = userRepository.findByUsername(PARTICIPANT_USERNAME).userId
             mongoSurveyParticipationRepository.insert(surveyParticipation([
                     participantId: participantId,
-                    status: FINISHED
+                    status: SurveyStatus.TIMEOUT
             ]))
             ParticipationModificationDto dto = new ParticipationModificationDto(CANCEL, null)
         when:
@@ -127,6 +128,7 @@ class SurveyParticipationEndpointIntTest extends BaseIntegrationTest{
             response.data.errors.first() == "SurveyParticipation with id: 1-1 is not in progress."
     }
 
+    @Ignore
     def "should validate if values in body are not proper"() {
         given:
 //            Map body = [
