@@ -49,5 +49,5 @@ data class MongoSurveyParticipation(
 }
 
 enum class SurveyStatus{
-    COMPLETED, IN_PROGRESS, CANCELLED, FINISHED
+    COMPLETED, IN_PROGRESS, CANCELLED, TIMEOUT
 }

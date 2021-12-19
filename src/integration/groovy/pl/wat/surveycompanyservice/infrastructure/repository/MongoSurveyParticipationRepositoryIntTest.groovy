@@ -11,6 +11,8 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.COMPLETED
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.TIMEOUT
 
 class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
 
@@ -57,5 +59,22 @@ class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
             SurveyParticipation surveyParticipation = mongoSurveyParticipationRepository.find(new SurveyParticipationId(SURVEY_PARTICIPATION_ID))
         then:
             surveyParticipation.id.raw == SURVEY_PARTICIPATION_ID
+    }
+
+    def 'should update all surveyParticipation that have timed out'() {
+        given:
+            mongoOperations.save(surveyParticipation().toMongoSurveyParticipation())
+            mongoOperations.save(surveyParticipation([
+                    surveyParticipationId: "2-2",
+                    hasToFinishUntil: clock.instant().minusSeconds(1).toString()
+            ]).toMongoSurveyParticipation())
+        when:
+            mongoSurveyParticipationRepository.finishAllUnfinishedInTime(clock.instant())
+        then:
+            List results = mongoOperations.findAll(MongoSurveyParticipation.class)
+            results.size() == 2
+        and:
+            results.find {it.id == "2-2"}.status == TIMEOUT.toString()
+            results.find {it.id == SURVEY_PARTICIPATION_ID}.status == IN_PROGRESS.toString()
     }
 }
