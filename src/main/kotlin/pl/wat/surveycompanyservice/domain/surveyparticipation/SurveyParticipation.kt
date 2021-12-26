@@ -11,10 +11,11 @@ data class SurveyParticipation(
     val id: SurveyParticipationId,
     val participantId: ParticipantId,
     val surveyId: SurveyId,
-    val status: SurveyStatus,
+    val status: ParticipationStatus,
     val startedAt: Instant,
     val hasToFinishUntil: Instant,
-    val completionCode: String?
+    val completionCode: String?,
+    val finishedAt: Instant?
     ) {
         fun toMongoSurveyParticipation(): MongoSurveyParticipation = MongoSurveyParticipation(
             id = id.raw,
@@ -23,7 +24,8 @@ data class SurveyParticipation(
             status = status.toString(),
             startedAt = startedAt,
             hasToFinishUntil = hasToFinishUntil,
-            completionCode = completionCode
+            completionCode = completionCode,
+            finishedAt = finishedAt
     )
 }
 
@@ -35,19 +37,21 @@ data class MongoSurveyParticipation(
     val status: String,
     val startedAt: Instant,
     val hasToFinishUntil: Instant,
-    val completionCode: String?
+    val completionCode: String?,
+    val finishedAt: Instant?
 ) {
     fun toSurveyParticipation(): SurveyParticipation = SurveyParticipation(
         id = SurveyParticipationId(id),
         participantId = ParticipantId(participantId),
         surveyId = SurveyId(surveyId),
-        status = SurveyStatus.valueOf(status),
+        status = ParticipationStatus.valueOf(status),
         startedAt = startedAt,
         hasToFinishUntil = hasToFinishUntil,
-        completionCode = completionCode
+        completionCode = completionCode,
+        finishedAt = finishedAt
     )
 }
 
-enum class SurveyStatus{
+enum class ParticipationStatus{
     COMPLETED, IN_PROGRESS, CANCELLED, TIMEOUT
 }

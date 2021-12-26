@@ -7,4 +7,7 @@ interface SurveyRepository {
     fun saveSurvey(survey: Survey)
     fun find(surveyId: SurveyId): Survey
     fun saveParticipationToSurvey(surveyId: SurveyId, spotsToUpdate: Int, surveyParticipationId: SurveyParticipationId)
+    fun findSurveysEligibleToFinish(): List<Survey>
+    fun findBySurveyIds(surveyIds: List<SurveyId>): List<Survey>
+    fun removeByIds(surveyIds: List<SurveyId>)
 }

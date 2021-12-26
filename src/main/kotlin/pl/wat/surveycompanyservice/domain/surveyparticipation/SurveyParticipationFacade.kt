@@ -5,8 +5,8 @@ import pl.wat.surveycompanyservice.api.Action.CANCEL
 import pl.wat.surveycompanyservice.api.Action.COMPLETE
 import pl.wat.surveycompanyservice.api.ParticipationModificationDto
 import pl.wat.surveycompanyservice.domain.survey.SurveyFacade
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.CANCELLED
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.COMPLETED
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.CANCELLED
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.COMPLETED
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId

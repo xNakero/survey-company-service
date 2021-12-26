@@ -1,7 +1,7 @@
 package pl.wat.surveycompanyservice.domain.surveyparticipation
 
 import org.springframework.stereotype.Service
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
@@ -22,6 +22,7 @@ class SurveyParticipationService(
             IN_PROGRESS,
             clock.instant(),
             clock.instant().plusSeconds(timeToCompleteInSeconds.toLong()),
+            null,
             null
         )
         surveyParticipationRepository.insert(surveyParticipation)
@@ -30,7 +31,7 @@ class SurveyParticipationService(
 
     fun manageParticipation(
         surveyParticipationId: SurveyParticipationId,
-        surveyStatus: SurveyStatus,
+        participationStatus: ParticipationStatus,
         completionCode: String?,
         participantId: ParticipantId
     ) {
@@ -39,7 +40,7 @@ class SurveyParticipationService(
             throw WrongParticipantException("Participant with id: ${participantId.raw} has no access to participation with id: ${surveyParticipationId.raw}")
         }
         if (participation.hasToFinishUntil.isAfter(clock.instant()) && participation.status == IN_PROGRESS) {
-            surveyParticipationRepository.update(surveyParticipationId, surveyStatus, completionCode)
+            surveyParticipationRepository.update(surveyParticipationId, participationStatus, completionCode, clock.instant())
         } else {
             throw SurveyParticipationNotInProgressException("SurveyParticipation with id: ${surveyParticipationId.raw} is not in progress.")
         }
@@ -48,6 +49,17 @@ class SurveyParticipationService(
     fun hasNoOtherParticipation(participantId: ParticipantId): Boolean =
         surveyParticipationRepository.findByParticipantId(participantId).isEmpty()
 
+    fun findInProgress(surveyIds: List<SurveyId>): List<SurveyParticipation> =
+        surveyParticipationRepository.findInProgressBySurveyIds(surveyIds)
+
+    fun findBySurveyIds(surveyIds: List<SurveyId>): Map<SurveyId, List<SurveyParticipation>> =
+        surveyParticipationRepository.findBySurveyIds(surveyIds)
+            .groupBy { it.surveyId }
+            .mapValues { it.value.map { sp -> sp } }
+
+    fun removeBySurveyIds(surveyIds: List<SurveyId>) {
+        surveyParticipationRepository.removeBySurveyIds(surveyIds)
+    }
 }
 
 class SurveyParticipationNotInProgressException(message: String?) : RuntimeException(message)

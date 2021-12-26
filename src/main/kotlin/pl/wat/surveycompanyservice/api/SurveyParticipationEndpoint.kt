@@ -15,7 +15,6 @@ import pl.wat.surveycompanyservice.infrastructure.validator.Enum
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
-import javax.validation.Valid
 
 @RestController
 class SurveyParticipationEndpoint(

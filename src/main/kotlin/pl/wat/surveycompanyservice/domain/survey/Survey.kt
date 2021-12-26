@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
+import java.time.Instant
 
 data class Survey(
     val id: SurveyId,
@@ -16,7 +17,9 @@ data class Survey(
     val description: String,
     val spotsTotal: Int,
     val spotsTaken: Int,
-    val completionCode: String
+    val completionCode: String,
+    val status: SurveyStatus,
+    val startedAt: Instant
 ) {
     fun hasFreeSpots(): Boolean = spotsTaken < spotsTotal
 
@@ -31,7 +34,9 @@ data class Survey(
         description = description,
         spotsTotal = spotsTotal,
         spotsTaken = spotsTaken,
-        completionCode = completionCode
+        completionCode = completionCode,
+        status = status.toString(),
+        startedAt = startedAt
     )
 }
 
@@ -47,7 +52,9 @@ data class MongoSurvey(
     val description: String,
     val spotsTotal: Int,
     val spotsTaken: Int,
-    val completionCode: String
+    val completionCode: String,
+    val status: String,
+    val startedAt: Instant
 ) {
     fun toSurvey(): Survey = Survey(
         id = SurveyId(id),
@@ -60,6 +67,12 @@ data class MongoSurvey(
         description = description,
         spotsTotal = spotsTotal,
         spotsTaken = spotsTaken,
-        completionCode = completionCode
+        completionCode = completionCode,
+        status = SurveyStatus.valueOf(status),
+        startedAt = startedAt
     )
+}
+
+enum class SurveyStatus {
+    ACTIVE, SCHEDULED_TO_FINISH
 }

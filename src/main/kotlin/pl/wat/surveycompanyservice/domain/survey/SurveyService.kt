@@ -21,4 +21,15 @@ class SurveyService(
         surveyRepository.saveParticipationToSurvey(surveyId, survey.spotsTaken + 1, surveyParticipationId)
         return survey
     }
+
+    fun findSurveysEligibleToFinish(): List<Survey> =
+        surveyRepository.findSurveysEligibleToFinish()
+
+    fun findBySurveyIds(surveyIds: List<SurveyId>): Map<SurveyId, Survey> =
+        surveyRepository.findBySurveyIds(surveyIds)
+            .associateBy( { it.id }, { it })
+
+    fun removeByIds(surveyIds: List<SurveyId>) {
+        surveyRepository.removeByIds(surveyIds)
+    }
 }

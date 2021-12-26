@@ -7,6 +7,8 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileService
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
+import java.time.Clock
+import java.time.Instant
 import java.util.*
 
 @Component
@@ -14,13 +16,14 @@ class SurveyFacade(
     private val surveyService: SurveyService,
     private val personalProfileService: PersonalProfileService,
     private val completionCodeFactory: CompletionCodeFactory,
-    private val surveyProperties: SurveyProperties
+    private val surveyProperties: SurveyProperties,
+    private val clock: Clock
 ) {
     fun saveSurvey(surveyDto: SurveyToPostDto, researcherId: ResearcherId) {
         val eligibleUsers = personalProfileService.findEligibleParticipantIds(surveyDto.queryParams)
             .also { if (it.isEmpty()) throw NoEligibleParticipantsException("There are no eligible participants.") }
         val completionCode = completionCodeFactory.generateCode(surveyProperties.codeLength)
-        val survey = surveyDto.toSurvey(researcherId, eligibleUsers, completionCode)
+        val survey = surveyDto.toSurvey(researcherId, eligibleUsers, completionCode, clock.instant())
         surveyService.saveSurvey(survey)
     }
 
@@ -37,7 +40,8 @@ class SurveyFacade(
 fun SurveyToPostDto.toSurvey(
     researcherId: ResearcherId,
     eligibleParticipantsIds: List<String>,
-    completionCode: String
+    completionCode: String,
+    timestamp: Instant
 ): Survey = Survey(
     id = SurveyId(UUID.randomUUID().toString()),
     researcherId = researcherId,
@@ -49,7 +53,9 @@ fun SurveyToPostDto.toSurvey(
     description = surveyParams.description,
     spotsTotal = determineTotalSpots(surveyParams.spots, eligibleParticipantsIds),
     spotsTaken = 0,
-    completionCode = completionCode
+    completionCode = completionCode,
+    status = SurveyStatus.ACTIVE,
+    startedAt = timestamp
 )
 
 fun determineTotalSpots(spots: Int, eligibleParticipantsIds: List<String>): Int =

@@ -1,6 +1,6 @@
 package pl.wat.surveycompanyservice.infrastructure.repository
 
-
+import org.jetbrains.annotations.NotNull
 import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.domain.survey.SurveyRepository
 import pl.wat.surveycompanyservice.shared.SurveyId
@@ -47,9 +47,32 @@ class InMemorySurveyRepository implements SurveyRepository {
                 survey.description,
                 survey.spotsTotal,
                 survey.spotsTaken + 1,
-                survey.completionCode
+                survey.completionCode,
+                survey.status,
+                survey.startedAt
         )
         saveSurvey(updatedSurvey)
+    }
+
+    @Override
+    List<Survey> findSurveysEligibleToFinish() {
+        return null
+    }
+
+    @Override
+    List<Survey> findBySurveyIds(@NotNull List<SurveyId> surveyIds) {
+        return null
+    }
+
+    @Override
+    void removeByIds(@NotNull List<SurveyId> surveyIds) {
+        for (surveyId in surveyIds) {
+            surveys.remove(
+                    surveys.find {
+                        it.id.raw == surveyId.raw
+                    }
+            )
+        }
     }
 
     void clear() {

@@ -2,13 +2,11 @@ package pl.wat.surveycompanyservice.scheduler
 
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.surveyparticipation.MongoSurveyParticipation
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
 
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
-import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_STATUS
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.TIMEOUT
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.TIMEOUT
 
 class SurveyParticipationSchedulerIntTest extends BaseIntegrationTest{
 

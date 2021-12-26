@@ -3,7 +3,7 @@ package pl.wat.surveycompanyservice.api
 import groovyx.net.http.HttpResponseDecorator
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.surveyparticipation.MongoSurveyParticipation
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
 import spock.lang.Ignore
 import spock.lang.Unroll
 
@@ -118,7 +118,7 @@ class SurveyParticipationEndpointIntTest extends BaseIntegrationTest{
             String participantId = userRepository.findByUsername(PARTICIPANT_USERNAME).userId
             mongoSurveyParticipationRepository.insert(surveyParticipation([
                     participantId: participantId,
-                    status: SurveyStatus.TIMEOUT
+                    status: ParticipationStatus.TIMEOUT
             ]))
             ParticipationModificationDto dto = new ParticipationModificationDto(CANCEL, null)
         when:

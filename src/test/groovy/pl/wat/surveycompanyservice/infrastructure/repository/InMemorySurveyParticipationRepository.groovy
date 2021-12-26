@@ -1,21 +1,22 @@
 package pl.wat.surveycompanyservice.infrastructure.repository
 
-import org.codehaus.groovy.runtime.InvokerHelper
+
 import org.jetbrains.annotations.NotNull
-import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
-import pl.wat.surveycompanyservice.domain.survey.Survey
+import org.jetbrains.annotations.Nullable
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationRepository
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
 import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
 import java.time.Clock
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArraySet
 
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.TIMEOUT
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.TIMEOUT
 
 class InMemorySurveyParticipationRepository implements SurveyParticipationRepository {
 
@@ -42,7 +43,7 @@ class InMemorySurveyParticipationRepository implements SurveyParticipationReposi
     }
 
     @Override
-    void update(SurveyParticipationId surveyParticipationId, SurveyStatus surveyStatus, String completionCode) {
+    void update(SurveyParticipationId surveyParticipationId, ParticipationStatus surveyStatus, String completionCode, Instant timestamp) {
         SurveyParticipation participation = surveyParticipations.find { it.id.raw == surveyParticipationId.raw }
         SurveyParticipation updatedParticipation = new SurveyParticipation(
                 participation.id,
@@ -51,7 +52,8 @@ class InMemorySurveyParticipationRepository implements SurveyParticipationReposi
                 surveyStatus,
                 participation.startedAt,
                 participation.hasToFinishUntil,
-                completionCode
+                completionCode,
+                timestamp
         )
         insert(updatedParticipation)
     }
@@ -73,9 +75,31 @@ class InMemorySurveyParticipationRepository implements SurveyParticipationReposi
                     TIMEOUT,
                     participation.startedAt,
                     participation.hasToFinishUntil,
-                    participation.completionCode
+                    participation.completionCode,
+                    participation.finishedAt
             )
             insert(newParticipation)
+        }
+    }
+
+    @Override
+    List<SurveyParticipation> findInProgressBySurveyIds(@NotNull List<SurveyId> surveyIds) {
+        return surveyParticipations.findAll {it.id.raw in surveyIds.raw && it.status == IN_PROGRESS}
+    }
+
+    @Override
+    List<SurveyParticipation> findBySurveyIds(@NotNull List<SurveyId> surveyIds) {
+        return surveyParticipations.findAll {it.id.raw in surveyIds.raw }
+    }
+
+    @Override
+    void removeBySurveyIds(@NotNull List<SurveyId> surveyIds) {
+        for (surveyId in surveyIds) {
+            surveyParticipations.remove(
+                    surveyParticipations.find {
+                        it.surveyId.raw == surveyId.raw
+                    }
+            )
         }
     }
 
