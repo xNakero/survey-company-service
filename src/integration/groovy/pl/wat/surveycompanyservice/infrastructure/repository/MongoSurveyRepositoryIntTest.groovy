@@ -1,6 +1,5 @@
 package pl.wat.surveycompanyservice.infrastructure.repository
 
-
 import org.springframework.dao.DuplicateKeyException
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
@@ -8,6 +7,7 @@ import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
+import static java.time.temporal.ChronoUnit.DAYS
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
@@ -72,5 +72,48 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
                 it.participationIds.contains(surveyParticipationId.raw)
                 it.spotsTaken == spotsToUpdate
             }
+    }
+
+    def 'should find only surveys eligible to finish'() {
+        given:
+            MongoSurvey notEligibleSurvey = survey().toMongoSurvey()
+            MongoSurvey eligibleSurvey = survey([
+                    surveyId: '123',
+                    startedAt: clock.instant().minus(7, DAYS).toString()
+            ]).toMongoSurvey()
+        and:
+            mongoOperations.save(notEligibleSurvey)
+            mongoOperations.save(eligibleSurvey)
+        when:
+            List result = mongoSurveyRepository.findSurveysEligibleToFinish()
+        then:
+            result.size() == 1
+            result.first().id.raw == '123'
+    }
+
+    def 'should find surveys by ids'() {
+        given:
+            MongoSurvey survey1 = survey().toMongoSurvey()
+            MongoSurvey survey2 = survey([surveyId: '123']).toMongoSurvey()
+            MongoSurvey survey3 = survey([surveyId: '456']).toMongoSurvey()
+        and:
+            mongoOperations.save(survey1)
+            mongoOperations.save(survey2)
+            mongoOperations.save(survey3)
+        when:
+            List result = mongoSurveyRepository.findBySurveyIds([new SurveyId('123'), new SurveyId('456')])
+        then:
+            result.size() == 2
+            result.id.raw.containsAll(['123', '456'])
+    }
+
+    def 'should remove surveys by ids'() {
+        given:
+            MongoSurvey survey1 = survey().toMongoSurvey()
+            mongoOperations.save(survey1)
+        when:
+            mongoSurveyRepository.removeByIds([new SurveyId(SURVEY_ID)])
+        then:
+            mongoOperations.findAll(MongoSurvey.class).size() == 1
     }
 }

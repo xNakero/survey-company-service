@@ -3,16 +3,20 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.surveyparticipation.MongoSurveyParticipation
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
 import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
+import java.time.Instant
+
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_ID
+import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.COMPLETED
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.TIMEOUT
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.COMPLETED
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.TIMEOUT
 
 class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
 
@@ -26,17 +30,19 @@ class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
             mongoOperations.findAll(MongoSurveyParticipation.class).first().id == SURVEY_PARTICIPATION_ID
     }
 
-    def 'should update SurveyParticipation status and completion code'() {
+    def 'should update SurveyParticipation status, finishedAt and completion code'() {
         given:
             mongoOperations.save(surveyParticipation().toMongoSurveyParticipation())
             String completionCode = 'COMPLETED'
-            SurveyStatus status = COMPLETED
+            ParticipationStatus status = COMPLETED
+        Instant finishedAt = clock.instant()
         when:
-            mongoSurveyParticipationRepository.update(new SurveyParticipationId(SURVEY_PARTICIPATION_ID), status, completionCode)
+            mongoSurveyParticipationRepository.update(new SurveyParticipationId(SURVEY_PARTICIPATION_ID), status, completionCode, finishedAt)
         then:
             with(mongoOperations.findAll(MongoSurveyParticipation.class).find {it.id == SURVEY_PARTICIPATION_ID}) {
                 it.status == status.toString()
                 it.completionCode == completionCode
+                it.finishedAt == finishedAt
             }
     }
 
@@ -76,5 +82,68 @@ class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
         and:
             results.find {it.id == "2-2"}.status == TIMEOUT.toString()
             results.find {it.id == SURVEY_PARTICIPATION_ID}.status == IN_PROGRESS.toString()
+    }
+
+    def 'should find surveyParticipations in progress only of particular surveys'() {
+        given:
+            MongoSurveyParticipation participation1 = surveyParticipation().toMongoSurveyParticipation()
+            MongoSurveyParticipation participation2 = surveyParticipation([
+                    status: 'CANCELLED',
+                    surveyParticipationId: '123'
+            ]).toMongoSurveyParticipation()
+            MongoSurveyParticipation participation3 = surveyParticipation([
+                    surveyParticipationId: '456',
+                    surveyId: '12345'
+            ]).toMongoSurveyParticipation()
+        and:
+            mongoOperations.save(participation1)
+            mongoOperations.save(participation2)
+            mongoOperations.save(participation3)
+        when:
+            List result = mongoSurveyParticipationRepository.findInProgressBySurveyIds([new SurveyId(SURVEY_ID)])
+        then:
+            result.size() == 1
+            result.first().id.raw == SURVEY_PARTICIPATION_ID
+    }
+
+    def 'should find surveyParticipations by surveyIds'() {
+        given:
+            MongoSurveyParticipation participation1 = surveyParticipation().toMongoSurveyParticipation()
+            MongoSurveyParticipation participation2 = surveyParticipation([
+                    surveyParticipationId: '123'
+            ]).toMongoSurveyParticipation()
+            MongoSurveyParticipation participation3 = surveyParticipation([
+                    surveyParticipationId: '456',
+                    surveyId: '12345'
+            ]).toMongoSurveyParticipation()
+        and:
+            mongoOperations.save(participation1)
+            mongoOperations.save(participation2)
+            mongoOperations.save(participation3)
+        when:
+            List result = mongoSurveyParticipationRepository.findBySurveyIds([new SurveyId(SURVEY_ID)])
+        then:
+            result.size() == 2
+            result.id.raw.containsAll([SURVEY_PARTICIPATION_ID, '123'])
+    }
+
+    def 'should remove surveys by surveyIds'() {
+        given:
+            MongoSurveyParticipation participation1 = surveyParticipation().toMongoSurveyParticipation()
+            MongoSurveyParticipation participation2 = surveyParticipation([
+                    surveyParticipationId: '123'
+            ]).toMongoSurveyParticipation()
+            MongoSurveyParticipation participation3 = surveyParticipation([
+                    surveyParticipationId: '456',
+                    surveyId: '12345'
+            ]).toMongoSurveyParticipation()
+        and:
+            mongoOperations.save(participation1)
+            mongoOperations.save(participation2)
+            mongoOperations.save(participation3)
+        when:
+            mongoSurveyParticipationRepository.removeBySurveyIds([new SurveyId(SURVEY_ID)])
+        then:
+            mongoOperations.findAll(MongoSurveyParticipation.class).size() == 1
     }
 }

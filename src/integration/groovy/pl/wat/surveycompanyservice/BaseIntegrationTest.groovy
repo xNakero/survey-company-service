@@ -34,9 +34,11 @@ import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.role.Role
 import pl.wat.surveycompanyservice.domain.role.RoleRepository
 import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
+import pl.wat.surveycompanyservice.domain.surveyhistory.MongoHistoryEntry
 import pl.wat.surveycompanyservice.domain.surveyparticipation.MongoSurveyParticipation
 import pl.wat.surveycompanyservice.domain.user.UserRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.ElasticPersonalProfileRepository
+import pl.wat.surveycompanyservice.infrastructure.repository.MongoHistoryEntryRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.MongoSurveyParticipationRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.MongoSurveyRepository
 import spock.lang.Shared
@@ -99,6 +101,9 @@ class BaseIntegrationTest extends Specification {
     @Autowired
     MongoSurveyParticipationRepository mongoSurveyParticipationRepository
 
+    @Autowired
+    MongoHistoryEntryRepository historyEntryRepository
+
     @Shared
     private static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:latest")
 
@@ -130,6 +135,7 @@ class BaseIntegrationTest extends Specification {
 
         mongoOperations.remove(new Query(), MongoSurvey.class)
         mongoOperations.remove(new Query(), MongoSurveyParticipation.class)
+        mongoOperations.remove(new Query(), MongoHistoryEntry.class)
         clearUsersDbs()
         clearPersonalProfiles()
         setupUsersDbs()

@@ -21,8 +21,12 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.domain.survey.Survey
+import pl.wat.surveycompanyservice.domain.survey.SurveyStatus
+import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryEntry
+import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryParticipation
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import pl.wat.surveycompanyservice.shared.HistoryEntryId
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
@@ -64,10 +68,14 @@ class IntegrationTestBuilders {
     public static final int SPOTS_TAKEN = 0
     public static final String COMPLETION_CODE = 'SQVQ3RBFSKSJ0X9UTWXJSPP306QO5C2L'
     public static final String SURVEY_PARTICIPATION_ID = '1-1'
-    public static final String SURVEY_STATUS = 'IN_PROGRESS'
+    public static final String PARTICIPATION_STATUS = 'IN_PROGRESS'
     public static final Instant STARTED_AT = Instant.parse('2021-11-11T10:00:00.000Z')
     public static final Instant HAS_TO_FINISH_UNTIL = Instant.parse('2021-11-11T10:20:00.000Z')
-
+    public static final String SURVEY_STATUS = 'ACTIVE'
+    public static final Instant SURVEY_STARTED_AT = Instant.parse('2021-11-11T10:30:00.000Z')
+    public static final Instant PARTICIPATION_FINISHED_AT = Instant.parse('2021-11-11T10:15:00.000Z')
+    public static final Boolean IS_VALID_CODE = true
+    public static final HISTORY_ENTRY_ID = '10001'
 
     @Autowired
     ObjectMapper objectMapper
@@ -205,6 +213,9 @@ class IntegrationTestBuilders {
         Integer spotsTotal = params.spotsTotal as Integer ?: SPOTS_TOTAL
         Integer spotsTaken = params.spotsTaken as Integer ?: SPOTS_TAKEN
         String completionCode = params.completionCode as String ?: COMPLETION_CODE
+        SurveyStatus status = params.status as SurveyStatus ?: SURVEY_STATUS as SurveyStatus
+        Instant startedAt = params.startedAt ? Instant.parse(params.startedAt) : SURVEY_STARTED_AT
+
 
         return new Survey(
                 surveyId,
@@ -217,7 +228,9 @@ class IntegrationTestBuilders {
                 description,
                 spotsTotal,
                 spotsTaken,
-                completionCode
+                completionCode,
+                status,
+                startedAt
         )
     }
 
@@ -254,10 +267,11 @@ class IntegrationTestBuilders {
                 new SurveyParticipationId(params.surveyParticipationId) : new SurveyParticipationId(SURVEY_PARTICIPATION_ID)
         ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
         SurveyId surveyId = params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
-        SurveyStatus status = params.status as SurveyStatus ?: SURVEY_STATUS as SurveyStatus
+        ParticipationStatus status = params.status as ParticipationStatus ?: PARTICIPATION_STATUS as ParticipationStatus
         Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
         Instant hasToFinishUntil = params.hasToFinishUntil ? Instant.parse(params.hasToFinishUntil) : HAS_TO_FINISH_UNTIL
         String completionCode = params.completionCode
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
 
         return new SurveyParticipation(
                 surveyParticipationId,
@@ -266,7 +280,57 @@ class IntegrationTestBuilders {
                 status,
                 startedAt,
                 hasToFinishUntil,
-                completionCode
+                completionCode,
+                finishedAt
+        )
+    }
+
+    static HistoryParticipation historyParticipation(Map params = [:]) {
+        SurveyParticipationId surveyParticipationId = params.surveyParticipationId != null ?
+                new SurveyParticipationId(params.surveyParticipationId) : new SurveyParticipationId(SURVEY_PARTICIPATION_ID)
+        ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
+        Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
+        String completionCode = params.completionCode
+        Boolean completedWithValidCode = params.completedWithValidCode as Boolean ?: IS_VALID_CODE
+
+        return new HistoryParticipation(
+                surveyParticipationId,
+                participantId,
+                startedAt,
+                finishedAt,
+                completionCode,
+                completedWithValidCode
+        )
+    }
+
+    static HistoryEntry historyEntry(Map params = [:]) {
+        HistoryEntryId historyEntryId = params.historyEntryId != null ?
+                new HistoryEntryId(params.historyEntryId) : new HistoryEntryId(HISTORY_ENTRY_ID)
+        SurveyId surveyId = params.surveyId != null ? new SurveyId(SURVEY_ID) : new SurveyId(SURVEY_ID)
+        String title = params.title as String ?: TITLE
+        String url = params.url as String ?: URL
+        Integer timeToCompleteInSeconds = params.timeToCompleteInSeconds as Integer ?: TIME_TO_COMPLETE_IN_SECONDS
+        String description = params.description as String ?: DESCRIPTION
+        Integer spotsTotal = params.spotsTotal as Integer ?: SPOTS_TOTAL
+        Integer spotsTaken = params.spotsTaken as Integer ?: SPOTS_TAKEN
+        String completionCode = params.completionCode as String ?: COMPLETION_CODE
+        Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
+
+        return new HistoryEntry(
+                historyEntryId,
+                surveyId,
+                title,
+                url,
+                timeToCompleteInSeconds,
+                description,
+                spotsTotal,
+                spotsTaken,
+                completionCode,
+                startedAt,
+                finishedAt,
+                []
         )
     }
 }

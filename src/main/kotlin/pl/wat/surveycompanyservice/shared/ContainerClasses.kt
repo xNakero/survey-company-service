@@ -9,3 +9,5 @@ data class SurveyId(val raw: String)
 data class ParticipantId(val raw: String)
 
 data class SurveyParticipationId(val raw: String)
+
+data class HistoryEntryId(val raw: String)

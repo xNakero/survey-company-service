@@ -22,9 +22,9 @@ import static pl.wat.surveycompanyservice.TestBuilders.survey
 import static pl.wat.surveycompanyservice.TestBuilders.surveyParticipation
 import static pl.wat.surveycompanyservice.api.Action.CANCEL
 import static pl.wat.surveycompanyservice.api.Action.COMPLETE
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.CANCELLED
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.COMPLETED
-import static pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus.IN_PROGRESS
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.CANCELLED
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.COMPLETED
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 
 class SurveyParticipationFacadeTest extends BaseUnitTest {
 

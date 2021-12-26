@@ -14,8 +14,9 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
 import pl.wat.surveycompanyservice.domain.role.Role
 import pl.wat.surveycompanyservice.domain.survey.Survey
+import pl.wat.surveycompanyservice.domain.survey.SurveyStatus
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
-import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyStatus
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
 import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.ResearcherId
@@ -55,9 +56,12 @@ class TestBuilders {
     public static final String SURVEY_ID = '61cb2fbf-e83a-4fd2-9d7b-879686653699'
     public static final String RESEARCHER_ID = '2'
     public static final String SURVEY_PARTICIPATION_ID = '1-1'
-    public static final String DEFAULT_SURVEY_STATUS = 'IN_PROGRESS'
+    public static final String PARTICIPATION_STATUS = 'IN_PROGRESS'
     public static final Instant STARTED_AT = Instant.parse('2021-11-11T10:00:00.000Z')
     public static final Instant HAS_TO_FINISH_UNTIL = Instant.parse('2021-11-11T10:20:00.000Z')
+    public static final String SURVEY_STATUS = 'ACTIVE'
+    public static final Instant SURVEY_STARTED_AT = Instant.parse('2021-11-11T10:30:00.000Z')
+    public static final Instant PARTICIPATION_FINISHED_AT = Instant.parse('2021-11-11T10:15:00.000Z')
 
     static AppUser appUser(Map params = [:]) {
         return new AppUser(
@@ -178,6 +182,9 @@ class TestBuilders {
         Integer spotsTotal = params.spotsTotal as Integer ?: SPOTS_TOTAL
         Integer spotsTaken = params.spotsTaken as Integer ?: SPOTS_TAKEN
         String completionCode = params.completionCode as String ?: COMPLETION_CODE
+        SurveyStatus status = params.status as SurveyStatus ?: SURVEY_STATUS as SurveyStatus
+        Instant startedAt = params.startedAt ? Instant.parse(params.startedAt) : SURVEY_STARTED_AT
+
 
         return new Survey(
                 surveyId,
@@ -190,7 +197,9 @@ class TestBuilders {
                 description,
                 spotsTotal,
                 spotsTaken,
-                completionCode
+                completionCode,
+                status,
+                startedAt
         )
     }
 
@@ -199,10 +208,11 @@ class TestBuilders {
                 new SurveyParticipationId(params.surveyParticipationId) : new SurveyParticipationId(SURVEY_PARTICIPATION_ID)
         ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
         SurveyId surveyId = params.surveyId != null ? new SurveyId(params.surveyId) : new SurveyId(SURVEY_ID)
-        SurveyStatus status = params.status as SurveyStatus ?: DEFAULT_SURVEY_STATUS as SurveyStatus
+        ParticipationStatus status = params.status as ParticipationStatus ?: PARTICIPATION_STATUS as ParticipationStatus
         Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
         Instant hasToFinishUntil = params.hasToFinishUntil ? Instant.parse(params.hasToFinishUntil) : HAS_TO_FINISH_UNTIL
         String completionCode = params.completionCode
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
 
         return new SurveyParticipation(
                 surveyParticipationId,
@@ -211,7 +221,8 @@ class TestBuilders {
                 status,
                 startedAt,
                 hasToFinishUntil,
-                completionCode
+                completionCode,
+                finishedAt
         )
     }
 }
