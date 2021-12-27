@@ -73,7 +73,7 @@ class IntegrationTestBuilders {
     public static final Instant HAS_TO_FINISH_UNTIL = Instant.parse('2021-11-11T10:20:00.000Z')
     public static final String SURVEY_STATUS = 'ACTIVE'
     public static final Instant SURVEY_STARTED_AT = Instant.parse('2021-11-11T10:30:00.000Z')
-    public static final Instant PARTICIPATION_FINISHED_AT = Instant.parse('2021-11-11T10:15:00.000Z')
+    public static final Instant FINISHED_AT = Instant.parse('2021-11-11T10:15:00.000Z')
     public static final Boolean IS_VALID_CODE = true
     public static final HISTORY_ENTRY_ID = '10001'
 
@@ -271,7 +271,7 @@ class IntegrationTestBuilders {
         Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
         Instant hasToFinishUntil = params.hasToFinishUntil ? Instant.parse(params.hasToFinishUntil) : HAS_TO_FINISH_UNTIL
         String completionCode = params.completionCode
-        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : FINISHED_AT
 
         return new SurveyParticipation(
                 surveyParticipationId,
@@ -290,9 +290,9 @@ class IntegrationTestBuilders {
                 new SurveyParticipationId(params.surveyParticipationId) : new SurveyParticipationId(SURVEY_PARTICIPATION_ID)
         ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
         Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
-        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : FINISHED_AT
         String completionCode = params.completionCode
-        Boolean completedWithValidCode = params.completedWithValidCode as Boolean ?: IS_VALID_CODE
+        Boolean completedWithValidCode = params.completedWithValidCode != null ? params.completedWithValidCode as Boolean : IS_VALID_CODE
 
         return new HistoryParticipation(
                 surveyParticipationId,
@@ -308,6 +308,7 @@ class IntegrationTestBuilders {
         HistoryEntryId historyEntryId = params.historyEntryId != null ?
                 new HistoryEntryId(params.historyEntryId) : new HistoryEntryId(HISTORY_ENTRY_ID)
         SurveyId surveyId = params.surveyId != null ? new SurveyId(SURVEY_ID) : new SurveyId(SURVEY_ID)
+        ResearcherId researcherId = params.researcherId != null ? new ResearcherId(params.researcherId) : new ResearcherId(RESEARCHER_ID)
         String title = params.title as String ?: TITLE
         String url = params.url as String ?: URL
         Integer timeToCompleteInSeconds = params.timeToCompleteInSeconds as Integer ?: TIME_TO_COMPLETE_IN_SECONDS
@@ -316,11 +317,12 @@ class IntegrationTestBuilders {
         Integer spotsTaken = params.spotsTaken as Integer ?: SPOTS_TAKEN
         String completionCode = params.completionCode as String ?: COMPLETION_CODE
         Instant startedAt =  params.startedAt ? Instant.parse(params.startedAt) : STARTED_AT
-        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : PARTICIPATION_FINISHED_AT
+        Instant finishedAt = params.finishedAt ? Instant.parse(params.finishedAt) : FINISHED_AT
 
         return new HistoryEntry(
                 historyEntryId,
                 surveyId,
+                researcherId,
                 title,
                 url,
                 timeToCompleteInSeconds,

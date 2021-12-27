@@ -4,13 +4,15 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import pl.wat.surveycompanyservice.shared.HistoryEntryId
 import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 import java.time.Instant
 
 data class HistoryEntry(
-    val historyEntryId: HistoryEntryId?,
+    val id: HistoryEntryId?,
     val surveyId: SurveyId,
+    val researcherId: ResearcherId,
     val title: String,
     val url: String,
     val timeToCompleteInSeconds: Int,
@@ -23,8 +25,9 @@ data class HistoryEntry(
     val historyParticipations: List<HistoryParticipation>
 ) {
     fun toMongoHistoryEntry(): MongoHistoryEntry = MongoHistoryEntry(
-        id = historyEntryId?.raw,
+        id = id?.raw,
         surveyId = surveyId.raw,
+        researcherId = researcherId.raw,
         title = title,
         url = url,
         timeToCompleteInSeconds = timeToCompleteInSeconds,
@@ -36,6 +39,8 @@ data class HistoryEntry(
         finishedAt = finishedAt,
         historyParticipations = historyParticipations.map { it.toMongoHistoryParticipation() }
     )
+
+    fun validSubmissions() = historyParticipations.count { it.completedWithValidCode }
 }
 
 data class HistoryParticipation(
@@ -60,6 +65,7 @@ data class HistoryParticipation(
 data class MongoHistoryEntry(
     @Id val id: String?,
     val surveyId: String,
+    val researcherId: String,
     val title: String,
     val url: String,
     val timeToCompleteInSeconds: Int,
@@ -72,8 +78,9 @@ data class MongoHistoryEntry(
     val historyParticipations: List<MongoHistoryParticipation>
 ) {
     fun toHistoryEntry(): HistoryEntry = HistoryEntry(
-        historyEntryId = HistoryEntryId(id!!),
+        id = HistoryEntryId(id!!),
         surveyId = SurveyId(surveyId),
+        researcherId = ResearcherId(researcherId),
         title = title,
         url = url,
         timeToCompleteInSeconds = timeToCompleteInSeconds,

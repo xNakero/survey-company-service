@@ -36,8 +36,9 @@ class SurveyScheduler(
 
     private fun SurveyId.toSurveyHistoryEntry(survey: Survey, surveyParticipations: List<SurveyParticipation>?) =
         HistoryEntry(
-            historyEntryId = null,
+            id = null,
             surveyId = survey.id,
+            researcherId = survey.researcherId,
             title = survey.title,
             url = survey.url,
             timeToCompleteInSeconds = survey.timeToCompleteInSeconds,
