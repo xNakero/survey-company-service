@@ -10,6 +10,8 @@ import pl.wat.surveycompanyservice.domain.survey.CompletionCodeFactory
 import pl.wat.surveycompanyservice.domain.survey.SurveyFacade
 import pl.wat.surveycompanyservice.domain.survey.SurveyProperties
 import pl.wat.surveycompanyservice.domain.survey.SurveyService
+import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryEntryFacade
+import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryEntryService
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationFacade
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationIdFactory
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationService
@@ -18,6 +20,7 @@ import pl.wat.surveycompanyservice.domain.user.UserRepository
 import pl.wat.surveycompanyservice.domain.user.UserService
 import pl.wat.surveycompanyservice.domain.user.UserServiceImpl
 import pl.wat.surveycompanyservice.infrastructure.filter.AuthenticationFilter
+import pl.wat.surveycompanyservice.infrastructure.repository.InMemoryHistoryEntryRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.InMemoryPersonalProfileRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.InMemorySurveyParticipationRepository
 import pl.wat.surveycompanyservice.infrastructure.repository.InMemorySurveyRepository
@@ -44,6 +47,7 @@ class BaseUnitTest extends Specification{
     protected InMemoryPersonalProfileRepository inMemoryPersonalProfileRepository = new InMemoryPersonalProfileRepository()
     protected InMemorySurveyRepository inMemorySurveyRepository = new InMemorySurveyRepository()
     protected InMemorySurveyParticipationRepository inMemorySurveyParticipationRepository = new InMemorySurveyParticipationRepository(clock)
+    protected InMemoryHistoryEntryRepository historyEntryRepository = new InMemoryHistoryEntryRepository()
     protected PersonalProfileService personalProfileService = new PersonalProfileService(inMemoryPersonalProfileRepository)
     protected PersonalProfileFacade personalProfileFacade = new PersonalProfileFacade(personalProfileService)
     protected UserFacade userFacade = new UserFacade(userService, tokenService, personalProfileFacade)
@@ -71,11 +75,14 @@ class BaseUnitTest extends Specification{
             inMemorySurveyParticipationRepository,
             clock
     )
+    protected HistoryEntryService historyEntryService = new HistoryEntryService(historyEntryRepository)
+    protected HistoryEntryFacade historyEntryFacade = new HistoryEntryFacade(historyEntryService)
 
     def setup() {
         inMemoryPersonalProfileRepository.clear()
         inMemorySurveyRepository.clear()
         inMemorySurveyParticipationRepository.clear()
+        historyEntryRepository.clear()
         clock.reset()
     }
 }

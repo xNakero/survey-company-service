@@ -150,7 +150,7 @@ class SurveyParticipationEndpointIntTest extends BaseIntegrationTest{
 //
 //    }
 
-    private getPrincipalId() {
+    private Long getPrincipalId() {
         return userRepository.findByUsername(PARTICIPANT_USERNAME).userId
     }
 
