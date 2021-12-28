@@ -130,8 +130,4 @@ class HistoryEntryEndpointIntTest extends BaseIntegrationTest{
                     ]
             ]
     }
-
-    private getPrincipalId(String username) {
-        return userRepository.findByUsername(username).userId
-    }
 }

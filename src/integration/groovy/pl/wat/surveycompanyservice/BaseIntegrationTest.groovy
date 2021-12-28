@@ -51,6 +51,7 @@ import java.time.LocalDate
 import static java.util.stream.Collectors.toList
 import static org.elasticsearch.client.RequestOptions.DEFAULT
 import static org.springframework.http.HttpHeaders.AUTHORIZATION
+import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_USERNAME
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.loginRequest
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.participantRegistrationRequest
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.researcherRegistrationRequest
@@ -147,6 +148,14 @@ class BaseIntegrationTest extends Specification {
         HttpResponseDecorator response = restClient.post(path: '/login', body: loginRequest([username: username, password: password]))
         Map tokens = response.data
         restClient.headers.put(AUTHORIZATION, tokens['authorizationToken'])
+    }
+
+    Long getPrincipalId() {
+        return userRepository.findByUsername(PARTICIPANT_USERNAME).userId
+    }
+
+    Long getPrincipalId(String username) {
+        return userRepository.findByUsername(username).userId
     }
 
     private void setupUsersDbs() {

@@ -150,17 +150,13 @@ class SurveyParticipationEndpointIntTest extends BaseIntegrationTest{
 //
 //    }
 
-    private Long getPrincipalId() {
-        return userRepository.findByUsername(PARTICIPANT_USERNAME).userId
-    }
-
     private HttpResponseDecorator participate(String surveyId = SURVEY_ID) {
         authAs(PARTICIPANT_USERNAME, PASSWORD)
-        return restClient.post([path: "/survey/$surveyId/participation"]) as HttpResponseDecorator
+        return restClient.post([path: "/surveys/$surveyId/participations"]) as HttpResponseDecorator
     }
 
     private HttpResponseDecorator manageParticipation(String participationId, ParticipationModificationDto body) {
         authAs(PARTICIPANT_USERNAME, PASSWORD)
-        return restClient.put([path: "/survey/$SURVEY_ID/participation/$participationId", body: objectMapper.writeValueAsString(body)]) as HttpResponseDecorator
+        return restClient.put([path: "/surveys/$SURVEY_ID/participations/$participationId", body: objectMapper.writeValueAsString(body)]) as HttpResponseDecorator
     }
 }

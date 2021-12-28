@@ -7,6 +7,7 @@ import pl.wat.surveycompanyservice.api.ParticipationModificationDto
 import pl.wat.surveycompanyservice.domain.survey.SurveyFacade
 import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.CANCELLED
 import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.COMPLETED
+import pl.wat.surveycompanyservice.infrastructure.repository.NoSuchSurveyException
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
@@ -22,7 +23,7 @@ class SurveyParticipationFacade(
             throw AlreadyParticipatesInOtherSurveyException("Participant already participates in a different survey.")
         }
 
-        val survey = surveyFacade.findSurvey(surveyId)
+        val survey = surveyFacade.findSurvey(surveyId) ?: throw NoSurveyFoundException("There is no such survey.")
         if (!survey.eligibleParticipantsIds.contains(participantId.raw)) {
             throw UnqualifiedParticipantException("Participant with id: ${participantId.raw} did not qualify for the survey: ${surveyId.raw}")
         }
@@ -59,3 +60,4 @@ class AlreadyParticipatesInOtherSurveyException(message: String?) : RuntimeExcep
 class UnqualifiedParticipantException(message: String?) : RuntimeException(message)
 class NoCompletionCodeException(message: String?) : RuntimeException(message)
 class NoFreeSpotsException(message: String?) : RuntimeException(message)
+class NoSurveyFoundException(message: String?) : RuntimeException(message)

@@ -60,6 +60,9 @@ class SurveyParticipationService(
     fun removeBySurveyIds(surveyIds: List<SurveyId>) {
         surveyParticipationRepository.removeBySurveyIds(surveyIds)
     }
+
+    fun findParticipationInProgress(participantId: ParticipantId): SurveyParticipation? =
+        surveyParticipationRepository.findInProgressByParticipantId(participantId)
 }
 
 class SurveyParticipationNotInProgressException(message: String?) : RuntimeException(message)

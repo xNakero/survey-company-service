@@ -80,6 +80,14 @@ class MongoSurveyParticipationRepository(
         mongoOperations.remove(query, MongoSurveyParticipation::class.java)
     }
 
+    override fun findInProgressByParticipantId(participantId: ParticipantId): SurveyParticipation? {
+        val query = Query.query(
+            Criteria.where(PARTICIPANT_ID).`is`(participantId.raw)
+                .and(STATUS).`is`(IN_PROGRESS)
+        )
+        return mongoOperations.find(query, MongoSurveyParticipation::class.java).firstOrNull()?.toSurveyParticipation()
+    }
+
     override fun find(surveyParticipationId: SurveyParticipationId): SurveyParticipation {
         val query = Query.query(Criteria.where(ID).`is`(surveyParticipationId.raw))
         val result = mongoOperations.find(query, MongoSurveyParticipation::class.java)
@@ -87,7 +95,6 @@ class MongoSurveyParticipationRepository(
     }
 
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(MongoSurveyParticipationRepository::class.java)
         const val ID = "_id"
         const val STATUS = "status"
         const val COMPLETION_CODE = "completionCode"

@@ -3,6 +3,8 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 import org.jetbrains.annotations.NotNull
 import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.domain.survey.SurveyRepository
+import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
@@ -24,7 +26,7 @@ class InMemorySurveyRepository implements SurveyRepository {
 
     @Override
     Survey find(SurveyId surveyId) {
-        return surveys.find {surveyId.raw == it.id.raw}
+        return surveys.find { surveyId.raw == it.id.raw }
     }
 
     @Override
@@ -33,7 +35,7 @@ class InMemorySurveyRepository implements SurveyRepository {
             int spotsToUpdate,
             SurveyParticipationId surveyParticipationId
     ) {
-        Survey survey = surveys.find {it.id.raw == surveyId.raw}
+        Survey survey = surveys.find { it.id.raw == surveyId.raw }
         List participationIds = survey.participationIds
         participationIds.add(surveyParticipationId.raw)
         Survey updatedSurvey = new Survey(
@@ -73,6 +75,16 @@ class InMemorySurveyRepository implements SurveyRepository {
                     }
             )
         }
+    }
+
+    @Override
+    List<Survey> findAllByResearcherId(@NotNull ResearcherId researcherId) {
+        return surveys.findAll { it.researcherId.raw == researcherId.raw }.toList()
+    }
+
+    @Override
+    List<Survey> findEligibleToParticipate(@NotNull ParticipantId participantId) {
+        return surveys.findAll { it.eligibleParticipantsIds.contains(participantId.raw) }.toList()
     }
 
     void clear() {

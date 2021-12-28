@@ -21,7 +21,7 @@ class SurveyParticipationEndpoint(
     val surveyParticipationFacade: SurveyParticipationFacade,
 ) {
 
-    @PostMapping("/survey/{surveyId}/participation")
+    @PostMapping("/surveys/{surveyId}/participations")
     @ResponseStatus(OK)
     fun participate(
         @AuthenticationPrincipal user: AppUser,
@@ -29,7 +29,7 @@ class SurveyParticipationEndpoint(
     ) = surveyParticipationFacade.participate(ParticipantId(user.userId.toString()), SurveyId(surveyId))
 
     //validation was failing for random reason had to disable it
-    @PutMapping("/survey/{surveyId}/participation/{participationId}")
+    @PutMapping("/surveys/{surveyId}/participations/{participationId}")
     @ResponseStatus(OK)
     fun manageParticipation(
         @AuthenticationPrincipal user: AppUser,
