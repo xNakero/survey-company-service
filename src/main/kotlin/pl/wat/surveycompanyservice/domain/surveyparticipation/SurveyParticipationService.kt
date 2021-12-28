@@ -63,6 +63,10 @@ class SurveyParticipationService(
 
     fun findParticipationInProgress(participantId: ParticipantId): SurveyParticipation? =
         surveyParticipationRepository.findInProgressByParticipantId(participantId)
+
+    fun findNotInProgress(participantId: ParticipantId): Map<SurveyId, SurveyParticipation> =
+        surveyParticipationRepository.findNotInProgress(participantId)
+            .associateBy( {it.surveyId}, {it})
 }
 
 class SurveyParticipationNotInProgressException(message: String?) : RuntimeException(message)

@@ -111,6 +111,11 @@ class InMemorySurveyParticipationRepository implements SurveyParticipationReposi
         return participations.size() == 1 ? participations.first() : null
     }
 
+    @Override
+    List<SurveyParticipation> findNotInProgress(@NotNull ParticipantId participantId) {
+        return surveyParticipations.findAll {it.participantId.raw == participantId.raw && it.status != IN_PROGRESS}.toList()
+    }
+
     void clear() {
         surveyParticipations.clear()
     }

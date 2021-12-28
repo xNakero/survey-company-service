@@ -27,7 +27,7 @@ class HistoryEntryService(
 
     private fun HistoryEntry.toParticipantHistoryEntryDto(participantId: ParticipantId): ParticipantHistoryEntryDto =
         ParticipantHistoryEntryDto(
-            historyEntryId = id!!.raw,
+            id = id!!.raw,
             title = title,
             timeToComplete = Duration.of(timeToCompleteInSeconds.toLong(), SECONDS).format(),
             description = description,
@@ -39,7 +39,7 @@ class HistoryEntryService(
 
     private fun HistoryEntry.toResearcherHistoryEntryDto(): ResearcherHistoryEntryDto =
         ResearcherHistoryEntryDto(
-            historyEntryId = id!!.raw,
+            id = id!!.raw,
             title = title,
             url = url,
             timeToComplete = Duration.of(timeToCompleteInSeconds.toLong(), SECONDS).format(),

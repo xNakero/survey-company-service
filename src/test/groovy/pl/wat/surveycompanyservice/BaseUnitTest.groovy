@@ -77,7 +77,11 @@ class BaseUnitTest extends Specification{
             clock
     )
     protected HistoryEntryService historyEntryService = new HistoryEntryService(historyEntryRepository)
-    protected HistoryEntryFacade historyEntryFacade = new HistoryEntryFacade(historyEntryService)
+    protected HistoryEntryFacade historyEntryFacade = new HistoryEntryFacade(
+            historyEntryService,
+            surveyParticipationService,
+            surveyService
+    )
 
     def setup() {
         inMemoryPersonalProfileRepository.clear()

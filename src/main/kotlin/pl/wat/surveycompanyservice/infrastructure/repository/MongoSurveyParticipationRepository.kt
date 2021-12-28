@@ -88,6 +88,14 @@ class MongoSurveyParticipationRepository(
         return mongoOperations.find(query, MongoSurveyParticipation::class.java).firstOrNull()?.toSurveyParticipation()
     }
 
+    override fun findNotInProgress(participantId: ParticipantId): List<SurveyParticipation> {
+        val query = Query.query(
+            Criteria.where(STATUS).ne(IN_PROGRESS)
+                .and(PARTICIPANT_ID).`is`(participantId.raw)
+        )
+        return mongoOperations.find(query, MongoSurveyParticipation::class.java).map { it.toSurveyParticipation() }
+    }
+
     override fun find(surveyParticipationId: SurveyParticipationId): SurveyParticipation {
         val query = Query.query(Criteria.where(ID).`is`(surveyParticipationId.raw))
         val result = mongoOperations.find(query, MongoSurveyParticipation::class.java)
