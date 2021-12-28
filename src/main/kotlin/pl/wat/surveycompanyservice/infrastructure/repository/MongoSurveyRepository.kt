@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component
 import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
 import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.domain.survey.SurveyRepository
+import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 import java.time.Clock
@@ -63,12 +65,24 @@ class MongoSurveyRepository(
         mongoOperations.remove(query, MongoSurvey::class.java)
     }
 
+    override fun findAllByResearcherId(researcherId: ResearcherId): List<Survey> {
+        val query = Query.query(Criteria.where(RESEARCHER_ID).`is`(researcherId.raw))
+        return mongoOperations.find(query, MongoSurvey::class.java).map { it.toSurvey() }
+    }
+
+    override fun findEligibleToParticipate(participantId: ParticipantId): List<Survey> {
+        val query = Query.query(Criteria.where(ELIGIBLE_PARTICIPANTS_IDS).all(participantId.raw))
+        return mongoOperations.find(query, MongoSurvey::class.java).map { it.toSurvey() }
+    }
+
     companion object {
         val logger: Logger = LoggerFactory.getLogger(MongoSurveyRepository::class.java)
         const val ID = "_id"
         const val SPOTS_TAKEN = "spotsTaken"
         const val PARTICIPATION_IDS = "participationIds"
         const val STARTED_AT = "startedAt"
+        const val RESEARCHER_ID = "ResearcherId"
+        const val ELIGIBLE_PARTICIPANTS_IDS = "eligibleParticipantsIds"
     }
 }
 

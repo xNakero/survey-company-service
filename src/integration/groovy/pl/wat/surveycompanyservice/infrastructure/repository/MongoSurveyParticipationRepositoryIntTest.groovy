@@ -146,4 +146,25 @@ class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
         then:
             mongoOperations.findAll(MongoSurveyParticipation.class).size() == 1
     }
+
+    def 'should return survey participations in progress by participantIds'() {
+        given:
+            MongoSurveyParticipation surveyParticipation1 = surveyParticipation().toMongoSurveyParticipation()
+            MongoSurveyParticipation surveyParticipation2 = surveyParticipation([
+                    status: COMPLETED.toString(),
+                    surveyParticipationId: '123'
+            ]).toMongoSurveyParticipation()
+            MongoSurveyParticipation surveyParticipation3 = surveyParticipation([
+                    surveyParticipationId: '456',
+                    participantId: '123'
+            ]).toMongoSurveyParticipation()
+        and:
+            mongoOperations.save(surveyParticipation1)
+            mongoOperations.save(surveyParticipation2)
+            mongoOperations.save(surveyParticipation3)
+        when:
+            SurveyParticipation participation = mongoSurveyParticipationRepository.findInProgressByParticipantId(new ParticipantId(PARTICIPANT_ID))
+        then:
+            participation.id.raw == SURVEY_PARTICIPATION_ID
+    }
 }

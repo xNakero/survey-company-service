@@ -23,6 +23,8 @@ data class Survey(
 ) {
     fun hasFreeSpots(): Boolean = spotsTaken < spotsTotal
 
+    fun freeSpots(): Int = spotsTotal - spotsTaken
+
     fun toMongoSurvey(): MongoSurvey = MongoSurvey(
         id = id.raw,
         researcherId = researcherId.raw,

@@ -17,7 +17,7 @@ class HistoryEntryFacade(
         )
 
     private fun AppUser.surveyHistoryDto(): List<HistoryEntryDto> =
-        when(roles.first().name) {
+        when (roles.first().name) {
             AppRole.PARTICIPANT.toString() -> historyEntryService.getSurveysForParticipant(ParticipantId(userId.toString()))
             AppRole.RESEARCHER.toString() -> historyEntryService.getSurveysForResearcher(ResearcherId(userId.toString()))
             else -> emptyList()

@@ -3,6 +3,7 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import pl.wat.surveycompanyservice.domain.survey.SurveyStatus
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationRepository
 import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
@@ -14,6 +15,7 @@ import java.time.Clock
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArraySet
 
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.TIMEOUT
@@ -101,6 +103,12 @@ class InMemorySurveyParticipationRepository implements SurveyParticipationReposi
                     }
             )
         }
+    }
+
+    @Override
+    SurveyParticipation findInProgressByParticipantId(@NotNull ParticipantId participantId) {
+        List participations =  surveyParticipations.findAll {it.status == IN_PROGRESS && it.participantId.raw == participantId.raw}.toList()
+        return participations.size() == 1 ? participations.first() : null
     }
 
     void clear() {

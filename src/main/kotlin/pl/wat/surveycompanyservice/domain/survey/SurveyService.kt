@@ -1,8 +1,16 @@
 package pl.wat.surveycompanyservice.domain.survey
 
 import org.springframework.stereotype.Service
+import pl.wat.surveycompanyservice.domain.surveyhistory.format
+import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
+import java.time.Duration
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.SECONDS
 
 @Service
 class SurveyService(
@@ -13,7 +21,7 @@ class SurveyService(
         surveyRepository.saveSurvey(survey)
     }
 
-    fun findSurvey(surveyId: SurveyId): Survey =
+    fun findSurvey(surveyId: SurveyId): Survey? =
         surveyRepository.find(surveyId)
 
     fun incrementSpotsTaken(surveyId: SurveyId, surveyParticipationId: SurveyParticipationId): Survey {
@@ -32,4 +40,24 @@ class SurveyService(
     fun removeByIds(surveyIds: List<SurveyId>) {
         surveyRepository.removeByIds(surveyIds)
     }
+
+    fun findAllByResearcherId(researcherId: ResearcherId): List<ResearcherSurveyDto> =
+        surveyRepository.findAllByResearcherId(researcherId)
+            .map { it.toResearcherSurveyDto() }
+
+    fun findEligibleSurveys(participantId: ParticipantId): List<Survey> =
+        surveyRepository.findEligibleToParticipate(participantId)
+
+    private fun Survey.toResearcherSurveyDto(): ResearcherSurveyDto =
+        ResearcherSurveyDto(
+            surveyId = id.raw,
+            title = title,
+            url = url,
+            timeToComplete = Duration.of(timeToCompleteInSeconds.toLong(), SECONDS).format(),
+            description = description,
+            spotsTotal = spotsTotal,
+            spotsTaken = spotsTaken,
+            completionCode = completionCode,
+            startedAt = startedAt
+        )
 }

@@ -54,19 +54,20 @@ class BaseUnitTest extends Specification{
     protected SurveyService surveyService = new SurveyService(inMemorySurveyRepository)
     protected CompletionCodeFactory completionCodeFactory = new CompletionCodeFactory()
     protected SurveyProperties surveyProperties = new SurveyProperties()
-    protected SurveyFacade surveyFacade = new SurveyFacade(surveyService,
-            personalProfileService,
-            completionCodeFactory,
-            surveyProperties,
-            clock
-    )
-    protected AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, tokenService, objectMapper)
     protected SurveyParticipationIdFactory surveyParticipationIdFactory = new SurveyParticipationIdFactory()
     protected SurveyParticipationService surveyParticipationService = new SurveyParticipationService(
             inMemorySurveyParticipationRepository,
             surveyParticipationIdFactory,
             clock
     )
+    protected SurveyFacade surveyFacade = new SurveyFacade(surveyService,
+            personalProfileService,
+            completionCodeFactory,
+            surveyProperties,
+            surveyParticipationService,
+            clock
+    )
+    protected AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, tokenService, objectMapper)
     protected SurveyParticipationFacade surveyParticipationFacade = new SurveyParticipationFacade(
             surveyParticipationService,
             surveyFacade

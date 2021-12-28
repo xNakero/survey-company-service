@@ -18,6 +18,7 @@ import pl.wat.surveycompanyservice.domain.survey.NoEligibleParticipantsException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.AlreadyParticipatesInOtherSurveyException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.NoCompletionCodeException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.NoFreeSpotsException
+import pl.wat.surveycompanyservice.domain.surveyparticipation.NoSurveyFoundException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationNotInProgressException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.UnqualifiedParticipantException
 import pl.wat.surveycompanyservice.domain.surveyparticipation.WrongParticipantException
@@ -170,6 +171,15 @@ class ExceptionHandler {
         AppException(
             httpStatus = FORBIDDEN,
             statusCode = FORBIDDEN.value(),
+            errors = listOf(exception.message)
+        )
+
+    @ExceptionHandler(NoSurveyFoundException::class)
+    @ResponseStatus(BAD_REQUEST)
+    fun noSurveyFoundExceptionHandler(exception: NoSurveyFoundException) =
+        AppException(
+            httpStatus = BAD_REQUEST,
+            statusCode = BAD_REQUEST.value(),
             errors = listOf(exception.message)
         )
 }

@@ -51,7 +51,7 @@ class HistoryEntryService(
             startedAt = startedAt,
             finishedAt = finishedAt
         )
-
-    private fun Duration.format() =
-        DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.MIDNIGHT.plus(this.toSeconds(), SECONDS))
 }
+
+fun Duration.format(): String =
+    DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.MIDNIGHT.plus(this.toSeconds(), SECONDS))

@@ -4,10 +4,14 @@ import org.springframework.dao.DuplicateKeyException
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
 import pl.wat.surveycompanyservice.domain.survey.Survey
+import pl.wat.surveycompanyservice.shared.ParticipantId
+import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
 import static java.time.temporal.ChronoUnit.DAYS
+import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_ID
+import static pl.wat.surveycompanyservice.IntegrationTestBuilders.RESEARCHER_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
@@ -115,5 +119,41 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
             mongoSurveyRepository.removeByIds([new SurveyId(SURVEY_ID)])
         then:
             mongoOperations.findAll(MongoSurvey.class).size() == 1
+    }
+
+    def 'should return surveys by researcherId'() {
+        given:
+            MongoSurvey survey1 = survey().toMongoSurvey()
+            MongoSurvey survey2 = survey([surveyId: '123']).toMongoSurvey()
+            MongoSurvey survey3 = survey([
+                    surveyId: '456',
+                    researcherId: '12345'
+            ]).toMongoSurvey()
+        and:
+            mongoOperations.save(survey1)
+            mongoOperations.save(survey2)
+            mongoOperations.save(survey3)
+        when:
+            List result = mongoSurveyRepository.findAllByResearcherId(new ResearcherId(RESEARCHER_ID))
+        then:
+            result.size() == 2
+            result.id.raw.containsAll([SURVEY_ID, '123'])
+    }
+
+    def 'should return surveys where participantId is eligible'() {
+        given:
+            MongoSurvey survey1 = survey().toMongoSurvey()
+            MongoSurvey survey2 = survey([
+                    eligibleParticipantIds: PARTICIPANT_ID,
+                    surveyId: '123'
+            ]).toMongoSurvey()
+        and:
+            mongoOperations.save(survey1)
+            mongoOperations.save(survey2)
+        when:
+            List result = mongoSurveyRepository.findEligibleToParticipate(new ParticipantId(PARTICIPANT_ID))
+        then:
+            result.size() == 1
+            result.first().id.raw == '123'
     }
 }

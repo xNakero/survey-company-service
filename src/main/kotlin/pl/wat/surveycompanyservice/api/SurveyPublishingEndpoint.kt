@@ -19,7 +19,7 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
 @RestController
-@RequestMapping("/survey")
+@RequestMapping("/surveys")
 class SurveyPublishingEndpoint(
     private val surveyFacade: SurveyFacade
 ) {

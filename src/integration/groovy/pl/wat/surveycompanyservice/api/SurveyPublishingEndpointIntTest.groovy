@@ -95,11 +95,11 @@ class SurveyPublishingEndpointIntTest extends BaseIntegrationTest{
     }
 
     private HttpResponseDecorator postSurvey(String body) {
-        return restClient.post(path: '/survey', body: body)
+        return restClient.post(path: '/surveys', body: body)
     }
 
     private HttpResponseDecorator getParticipantsCount(String body) {
-        return restClient.post(path: '/survey/participants-count', body: body)
+        return restClient.post(path: '/surveys/participants-count', body: body)
     }
 
 }
