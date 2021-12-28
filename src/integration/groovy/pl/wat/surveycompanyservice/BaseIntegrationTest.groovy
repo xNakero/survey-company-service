@@ -21,8 +21,10 @@ import org.springframework.data.elasticsearch.client.RestClients
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories
+import org.springframework.data.mongodb.core.MongoClientFactoryBean
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.MongoDBContainer
@@ -60,7 +62,12 @@ import static pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
 
 @Testcontainers
 @SpringBootTest(
-        classes = [SurveyCompanyServiceApplication, ElasticIntegrationTestConfig, IntegrationTestConfig],
+        classes = [
+                SurveyCompanyServiceApplication,
+                ElasticIntegrationTestConfig,
+                IntegrationTestConfig,
+                MongoIntegrationTestConfig
+        ],
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 class BaseIntegrationTest extends Specification {
@@ -219,6 +226,21 @@ class BaseIntegrationTest extends Specification {
         @Bean
         ElasticsearchRestTemplate elasticSearchRestTemplate() {
             return new ElasticsearchRestTemplate(elasticsearchClient())
+        }
+    }
+
+    @Configuration
+    @CompileStatic
+    @EnableMongoRepositories(basePackages = ["pl.wat.surveycompanyservice"])
+    static class MongoIntegrationTestConfig {
+
+        @Primary
+        @Bean
+        MongoClientFactoryBean mongoClientFactoryBean() {
+            MongoClientFactoryBean mongo = new MongoClientFactoryBean()
+            mongo.setHost(mongoContainer.getHost())
+            mongo.setPort(mongoContainer.getFirstMappedPort())
+            return mongo
         }
     }
 
