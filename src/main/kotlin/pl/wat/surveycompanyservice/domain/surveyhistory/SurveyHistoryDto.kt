@@ -13,7 +13,7 @@ data class SurveyHistoryDto(
 open class HistoryEntryDto
 
 data class ResearcherHistoryEntryDto(
-    val historyEntryId: String,
+    val id: String,
     val title: String,
     val url: String,
     val timeToComplete: String,
@@ -27,7 +27,7 @@ data class ResearcherHistoryEntryDto(
 ) : HistoryEntryDto()
 
 data class ParticipantHistoryEntryDto(
-    val historyEntryId: String,
+    val id: String,
     val title: String,
     val timeToComplete: String,
     val description: String,

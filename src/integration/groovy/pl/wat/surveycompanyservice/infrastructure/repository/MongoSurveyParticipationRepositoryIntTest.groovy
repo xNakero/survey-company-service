@@ -14,6 +14,8 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
+import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
+import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.CANCELLED
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.COMPLETED
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 import static pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.TIMEOUT
@@ -166,5 +168,32 @@ class MongoSurveyParticipationRepositoryIntTest extends BaseIntegrationTest{
             SurveyParticipation participation = mongoSurveyParticipationRepository.findInProgressByParticipantId(new ParticipantId(PARTICIPANT_ID))
         then:
             participation.id.raw == SURVEY_PARTICIPATION_ID
+    }
+
+    def 'should return participations with different statuses than IN_PROGRESS'() {
+        given:
+            MongoSurveyParticipation surveyParticipation1 = surveyParticipation().toMongoSurveyParticipation()
+            MongoSurveyParticipation surveyParticipation2 = surveyParticipation([
+                    surveyParticipationId: '123',
+                    status: COMPLETED.toString()
+            ]).toMongoSurveyParticipation()
+            MongoSurveyParticipation surveyParticipation3 = surveyParticipation([
+                    surveyParticipationId: '456',
+                    status: TIMEOUT.toString()
+            ]).toMongoSurveyParticipation()
+            MongoSurveyParticipation surveyParticipation4 = surveyParticipation([
+                    surveyParticipationId: '789',
+                    status: CANCELLED.toString()
+            ]).toMongoSurveyParticipation()
+        and:
+            mongoOperations.save(surveyParticipation1)
+            mongoOperations.save(surveyParticipation2)
+            mongoOperations.save(surveyParticipation3)
+            mongoOperations.save(surveyParticipation4)
+        when:
+            List result = mongoSurveyParticipationRepository.findNotInProgress(new ParticipantId(PARTICIPANT_ID))
+        then:
+            result.size() == 3
+            result.id.raw as Set == ['123', '456', '789'] as Set
     }
 }

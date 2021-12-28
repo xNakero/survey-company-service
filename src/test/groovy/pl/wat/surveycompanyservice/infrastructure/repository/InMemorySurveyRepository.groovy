@@ -63,7 +63,7 @@ class InMemorySurveyRepository implements SurveyRepository {
 
     @Override
     List<Survey> findBySurveyIds(@NotNull List<SurveyId> surveyIds) {
-        return null
+        return surveys.findAll { surveyIds.raw.contains(it.id.raw)}.toList()
     }
 
     @Override

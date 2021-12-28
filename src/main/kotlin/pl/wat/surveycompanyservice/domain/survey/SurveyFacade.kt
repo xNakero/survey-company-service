@@ -60,7 +60,9 @@ class SurveyFacade(
         }
 
     private fun surveysDtoForResearcher(researcherId: ResearcherId): ResearcherSurveysDto =
-        ResearcherSurveysDto(surveyService.findAllByResearcherId(researcherId))
+        surveyService.findAllByResearcherId(researcherId)
+            .sortedByDescending { it.startedAt }
+            .let { ResearcherSurveysDto(it) }
 
     private fun surveysDtoForParticipant(participantId: ParticipantId): ParticipantSurveysDto {
         val participationInProgress = surveyParticipationService.findParticipationInProgress(participantId)

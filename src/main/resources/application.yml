@@ -22,12 +22,5 @@ spring:
       connection-timeout: 1s
       uris: localhost:9200
 
-#  data:
-#    mongodb:
-#      authentication-database: admin
-#      username: username
-#      password: password
-#      uri: mongodb://localhost:27017
-
 server:
   port: 8080

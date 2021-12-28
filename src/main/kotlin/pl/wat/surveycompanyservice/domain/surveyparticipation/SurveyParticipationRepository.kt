@@ -15,4 +15,5 @@ interface SurveyParticipationRepository {
     fun findBySurveyIds(surveyIds: List<SurveyId>): List<SurveyParticipation>
     fun removeBySurveyIds(surveyIds: List<SurveyId>)
     fun findInProgressByParticipantId(participantId: ParticipantId): SurveyParticipation?
+    fun findNotInProgress(participantId: ParticipantId): List<SurveyParticipation>
 }
