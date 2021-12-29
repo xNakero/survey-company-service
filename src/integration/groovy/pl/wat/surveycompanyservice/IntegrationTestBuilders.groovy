@@ -20,6 +20,7 @@ import pl.wat.surveycompanyservice.domain.profile.Language
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
+import pl.wat.surveycompanyservice.domain.profile.Sex
 import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.domain.survey.SurveyStatus
 import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryEntry
@@ -43,6 +44,7 @@ class IntegrationTestBuilders {
     public static final String JWT_REGEX = '^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$'
     public static final LocalDate DATE_OF_BIRTH = LocalDate.parse('2000-01-01')
     public static final String CIVIL_STATUS = 'SINGLE'
+    public static final String SEX = 'MALE'
     public static final String COUNTRY = 'POLAND'
     public static final String LANGUAGE = 'POLISH'
     public static final String EDUCATION_LEVEL = 'GRADUATE'
@@ -107,7 +109,8 @@ class IntegrationTestBuilders {
         return new PersonalProfileDto(
                 new BasicInformation(
                         params.dateOfBirth ? LocalDate.parse(params.dateOfBirth) : DATE_OF_BIRTH,
-                        params.civilStatus as String ?: CIVIL_STATUS
+                        params.civilStatus as String ?: CIVIL_STATUS,
+                        params.sex as String ?: SEX
                 ),
                 new Demographics(
                         params.countryOfBirth as String ?: COUNTRY,
@@ -135,6 +138,7 @@ class IntegrationTestBuilders {
         ParticipantId participantId = params.participantId != null ? new ParticipantId(params.participantId) : new ParticipantId(PARTICIPANT_ID)
         LocalDate dateOfBirth = params.dateOfBirth ? LocalDate.parse(params.dateOfBirth) : DATE_OF_BIRTH
         CivilStatus civilStatus = params.civilStatus as CivilStatus ?: CIVIL_STATUS as CivilStatus
+        Sex sex = params.sex as Sex ?: SEX as Sex
         Country countryOfBirth = params.countryOfBirth as Country ?: COUNTRY as Country
         Country nationality = params.nationality as Country ?: COUNTRY as Country
         Country currentCountry = params.currentCountry as Country ?: COUNTRY as Country
@@ -151,6 +155,7 @@ class IntegrationTestBuilders {
                 participantId,
                 dateOfBirth,
                 civilStatus,
+                sex,
                 countryOfBirth,
                 nationality,
                 currentCountry,
@@ -169,6 +174,7 @@ class IntegrationTestBuilders {
         Integer olderOrEqualThan = params.olderOrEqualThan as Integer
         Integer youngerOrEqualThan = params.youngerOrEqualThan as Integer
         String civilStatus = params.civilStatus as String
+        String sex = params.sex as String
         String countryOfBirth = params.countryOfBirth as String
         String nationality = params.nationality as String
         String currentCountry = params.currentCountry as String
@@ -186,6 +192,7 @@ class IntegrationTestBuilders {
                 olderOrEqualThan,
                 youngerOrEqualThan,
                 civilStatus,
+                sex,
                 countryOfBirth,
                 nationality,
                 currentCountry,

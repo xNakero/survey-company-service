@@ -60,6 +60,9 @@ class InMemoryPersonalProfileRepository implements PersonalProfileRepository {
         if (queryParams.civilStatus != null) {
             participants = participants.findAll {it.civilStatus.toString() == queryParams.civilStatus}
         }
+        if (queryParams.sex != null) {
+            participants = participants.findAll { it.sex.toString() == queryParams.sex}
+        }
         if (queryParams.countryOfBirth != null) {
             participants = participants.findAll {it.countryOfBirth.toString() == queryParams.countryOfBirth}
         }
