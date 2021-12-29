@@ -20,6 +20,7 @@ import pl.wat.surveycompanyservice.domain.profile.Language
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileFacade
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
+import pl.wat.surveycompanyservice.domain.profile.Sex
 import pl.wat.surveycompanyservice.domain.user.AppUser
 import pl.wat.surveycompanyservice.infrastructure.validator.Enum
 import pl.wat.surveycompanyservice.shared.ParticipantId
@@ -59,6 +60,7 @@ data class PersonalProfileDto(
         participantId = ParticipantId(userId),
         dateOfBirth = basicInformation.dateOfBirth,
         civilStatus = basicInformation.civilStatus?.let { CivilStatus.valueOf(it) },
+        sex = basicInformation.sex?.let { Sex.valueOf(it) },
         countryOfBirth = demographics.countryOfBirth?.let { Country.valueOf(it) },
         nationality = demographics.nationality?.let { Country.valueOf(it) },
         currentCountry = demographics.currentCountry?.let { Country.valueOf(it) },
@@ -75,7 +77,8 @@ data class PersonalProfileDto(
 
 data class BasicInformation(
     val dateOfBirth: LocalDate?,
-    @field:Enum(CivilStatus::class, message = "There is no such civil status.") val civilStatus: String?
+    @field:Enum(CivilStatus::class, message = "There is no such civil status.") val civilStatus: String?,
+    @field:Enum(Sex::class, message = "There is no such sex.") val sex: String?
 )
 
 data class Demographics(

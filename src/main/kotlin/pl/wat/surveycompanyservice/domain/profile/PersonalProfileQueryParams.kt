@@ -12,6 +12,7 @@ data class PersonalProfileQueryParams(
     @field:Max(value = 99, message = "Age has to be maximum 99.")
     val youngerOrEqualThan: Int?,
     @field:Enum(CivilStatus::class, message = "There is no such civil status.") val civilStatus: String?,
+    @field:Enum(Sex::class, "There is no such sex.") val sex: String?,
     @field:Enum(Country::class, message = "There is no such country.") val countryOfBirth: String?,
     @field:Enum(Country::class, message = "There is no such country.")val nationality: String?,
     @field:Enum(Country::class, message = "There is no such country.")val currentCountry: String?,

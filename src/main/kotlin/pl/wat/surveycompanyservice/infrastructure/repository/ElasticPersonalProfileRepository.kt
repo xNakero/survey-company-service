@@ -29,6 +29,7 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfile
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileRepository
 import pl.wat.surveycompanyservice.domain.profile.PoliticalSide
+import pl.wat.surveycompanyservice.domain.profile.Sex
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import java.time.Clock
 import java.time.LocalDate
@@ -99,6 +100,7 @@ class ElasticPersonalProfileRepository(
                 }
         }
         queryParams.civilStatus?.let { boolQuery.must(QueryBuilders.matchQuery(CIVIL_STATUS, it)) }
+        queryParams.sex?.let { boolQuery.must(QueryBuilders.matchQuery(SEX, it)) }
         queryParams.countryOfBirth?.let { boolQuery.must(QueryBuilders.matchQuery(COUNTRY_OF_BIRTH, it)) }
         queryParams.nationality?.let { boolQuery.must(QueryBuilders.matchQuery(NATIONALITY, it)) }
         queryParams.currentCountry?.let { boolQuery.must(QueryBuilders.matchQuery(CURRENT_COUNTRY, it)) }
@@ -138,6 +140,7 @@ class ElasticPersonalProfileRepository(
         mutableMapOf(
             DATE_OF_BIRTH to dateOfBirth,
             CIVIL_STATUS to civilStatus,
+            SEX to sex,
             COUNTRY_OF_BIRTH to countryOfBirth,
             NATIONALITY to nationality,
             CURRENT_COUNTRY to currentCountry,
@@ -158,6 +161,7 @@ class ElasticPersonalProfileRepository(
         const val ID = "_id"
         const val DATE_OF_BIRTH = "dateOfBirth"
         const val CIVIL_STATUS = "civilStatus"
+        const val SEX = "sex"
         const val COUNTRY_OF_BIRTH = "countryOfBirth"
         const val NATIONALITY = "nationality"
         const val CURRENT_COUNTRY = "currentCountry"
@@ -176,6 +180,7 @@ class ElasticPersonalProfileRepository(
 data class PersonalProfileSearchResult(
     val dateOfBirth: LocalDate?,
     val civilStatus: String?,
+    val sex: String?,
     val countryOfBirth: String?,
     val nationality: String?,
     val currentCountry: String?,
@@ -192,6 +197,7 @@ data class PersonalProfileSearchResult(
         participantId = participantId,
         dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.let { CivilStatus.valueOf(it) },
+        sex = sex?.let { Sex.valueOf(it) },
         countryOfBirth = countryOfBirth?.let { Country.valueOf(it) },
         nationality = nationality?.let { Country.valueOf(it) },
         currentCountry = currentCountry?.let { Country.valueOf(it) },

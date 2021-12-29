@@ -31,6 +31,7 @@ class PersonalProfileService(
         participantId = participantId,
         dateOfBirth = null,
         civilStatus = null,
+        sex = null,
         countryOfBirth = null,
         nationality = null,
         currentCountry = null,
@@ -48,7 +49,8 @@ class PersonalProfileService(
 fun PersonalProfile.toPersonalProfileDto(): PersonalProfileDto = PersonalProfileDto(
     basicInformation = BasicInformation(
         dateOfBirth = dateOfBirth,
-        civilStatus = civilStatus?.toString()
+        civilStatus = civilStatus?.toString(),
+        sex = sex?.toString()
     ),
     demographics = Demographics(
         countryOfBirth = countryOfBirth?.toString(),

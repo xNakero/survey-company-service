@@ -16,6 +16,7 @@ data class PersonalProfile(
     val participantId: ParticipantId,
     val dateOfBirth: LocalDate?,
     val civilStatus: CivilStatus?,
+    val sex: Sex?,
     val countryOfBirth: Country?,
     val nationality: Country?,
     val currentCountry: Country?,
@@ -33,6 +34,7 @@ data class PersonalProfile(
         participantId = participantId.raw,
         dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.toString(),
+        sex = sex?.toString(),
         countryOfBirth = countryOfBirth?.toString(),
         nationality = nationality?.toString(),
         currentCountry = currentCountry?.toString(),
@@ -52,6 +54,7 @@ data class ElasticPersonalProfile(
     @Id val participantId: String,
     @field:Field(type = Date) val dateOfBirth: LocalDate?,
     @field:Field(type = Text) val civilStatus: String?,
+    @field:Field(type = Text) val sex: String?,
     @field:Field(type = Text) val countryOfBirth: String?,
     @field:Field(type = Text) val nationality: String?,
     @field:Field(type = Text) val currentCountry: String?,
@@ -68,6 +71,7 @@ data class ElasticPersonalProfile(
         participantId = ParticipantId(participantId),
         dateOfBirth = dateOfBirth,
         civilStatus = civilStatus?.let { CivilStatus.valueOf(it) },
+        sex = sex?.let { Sex.valueOf(it) },
         countryOfBirth = countryOfBirth?.let { Country.valueOf(it) },
         nationality = nationality?.let { Country.valueOf(it) },
         currentCountry = currentCountry?.let { Country.valueOf(it) },
@@ -84,6 +88,10 @@ data class ElasticPersonalProfile(
 
 enum class CivilStatus {
     SINGLE, MARRIED, DIVORCED, WIDOW
+}
+
+enum class Sex {
+    MALE, FEMALE, OTHER
 }
 
 enum class Country {

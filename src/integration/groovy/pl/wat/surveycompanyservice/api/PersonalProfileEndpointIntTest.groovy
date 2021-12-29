@@ -16,6 +16,7 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.MONTHLY_INCOME
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PARTICIPANT_USERNAME
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.PASSWORD
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.POLITICAL_SIDE
+import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SEX
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.personalProfileDto
 
 class PersonalProfileEndpointIntTest extends BaseIntegrationTest {
@@ -31,6 +32,7 @@ class PersonalProfileEndpointIntTest extends BaseIntegrationTest {
             with(response.data) {
                 basicInformation.dateOfBirth == DATE_OF_BIRTH.toString()
                 basicInformation.civilStatus == CIVIL_STATUS
+                basicInformation.sex == SEX
                 demographics.countryOfBirth == COUNTRY
                 demographics.nationality == COUNTRY
                 demographics.currentCountry == COUNTRY
@@ -49,6 +51,7 @@ class PersonalProfileEndpointIntTest extends BaseIntegrationTest {
         given:
             String profileDto = objectMapper.writeValueAsString(personalProfileDto([
                     civilStatus: 'STATUS',
+                    sex: 'SEX',
                     countryOfBirth: 'COUNTRY',
                     nationality: 'COUNTRY',
                     currentCountry: 'COUNTRY',
@@ -76,7 +79,8 @@ class PersonalProfileEndpointIntTest extends BaseIntegrationTest {
                     'There is no such employment status.',
                     'There is no such country for nationality.',
                     'There is no such form of employment.',
-                    'There is no such language.'
+                    'There is no such language.',
+                    "There is no such sex."
             ] as Set)
     }
 

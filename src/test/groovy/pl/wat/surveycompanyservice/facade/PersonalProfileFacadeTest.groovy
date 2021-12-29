@@ -17,6 +17,7 @@ import static pl.wat.surveycompanyservice.TestBuilders.LANGUAGE
 import static pl.wat.surveycompanyservice.TestBuilders.MONTHLY_INCOME
 import static pl.wat.surveycompanyservice.TestBuilders.PARTICIPANT_ID
 import static pl.wat.surveycompanyservice.TestBuilders.POLITICAL_SIDE
+import static pl.wat.surveycompanyservice.TestBuilders.SEX
 import static pl.wat.surveycompanyservice.TestBuilders.personalProfile
 
 class PersonalProfileFacadeTest extends BaseUnitTest {
@@ -58,6 +59,7 @@ class PersonalProfileFacadeTest extends BaseUnitTest {
             with(profile) {
                 it.basicInformation.dateOfBirth == DATE_OF_BIRTH
                 it.basicInformation.civilStatus.toString() == CIVIL_STATUS
+                it.basicInformation.sex.toString() == SEX
                 it.demographics.countryOfBirth.toString() == COUNTRY
                 it.demographics.nationality.toString() == COUNTRY
                 it.demographics.currentCountry.toString() == COUNTRY
