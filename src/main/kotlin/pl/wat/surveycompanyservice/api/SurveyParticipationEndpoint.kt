@@ -3,6 +3,7 @@ package pl.wat.surveycompanyservice.api
 import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus.OK
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -17,6 +18,7 @@ import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
 @RestController
+@CrossOrigin
 class SurveyParticipationEndpoint(
     val surveyParticipationFacade: SurveyParticipationFacade,
 ) {

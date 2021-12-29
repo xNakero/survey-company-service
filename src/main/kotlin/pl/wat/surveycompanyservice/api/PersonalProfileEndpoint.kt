@@ -3,6 +3,7 @@ package pl.wat.surveycompanyservice.api
 import org.springframework.http.HttpStatus.OK
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -28,6 +29,7 @@ import javax.validation.constraints.Min
 
 @RestController
 @RequestMapping("/personal-profile")
+@CrossOrigin
 class PersonalProfileEndpoint(
     private val personalProfileFacade: PersonalProfileFacade
 ) {
