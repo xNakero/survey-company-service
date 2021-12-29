@@ -32,8 +32,11 @@ open class WebSecurityConfig(
 
     override fun configure(http: HttpSecurity?) {
         http!!
+            .cors()
+            .and()
             .csrf().disable()
-            .cors().disable()
+            .headers().frameOptions().disable()
+            .and()
             .sessionManagement().sessionCreationPolicy(STATELESS)
             .and()
             .authorizeRequests()
@@ -43,8 +46,7 @@ open class WebSecurityConfig(
                     "survey",
                     "survey/participants-count"
                 ).authenticated()
-                .antMatchers(
-                    "personal-profile").hasRole(PARTICIPANT.toString())
+                .antMatchers("personal-profile").hasRole(PARTICIPANT.toString())
                 .antMatchers(
                     "survey",
                     "survey/participants-count"
