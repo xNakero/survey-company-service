@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.URL
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,6 +21,7 @@ import javax.validation.constraints.Min
 
 @RestController
 @RequestMapping("/surveys")
+@CrossOrigin
 class SurveyPublishingEndpoint(
     private val surveyFacade: SurveyFacade
 ) {

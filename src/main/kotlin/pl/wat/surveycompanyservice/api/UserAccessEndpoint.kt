@@ -4,6 +4,7 @@ import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -15,6 +16,7 @@ import javax.validation.Valid
 import javax.validation.constraints.Email
 
 @RestController
+@CrossOrigin
 class UserAccessEndpoint(
     private val userFacade: UserFacade
 ) {
