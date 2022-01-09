@@ -8,6 +8,7 @@ import pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
 import pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
 import pl.wat.surveycompanyservice.domain.survey.SurveyStatus.ACTIVE
 import pl.wat.surveycompanyservice.domain.surveyhistory.format
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus.IN_PROGRESS
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationService
 import pl.wat.surveycompanyservice.shared.ParticipantId
@@ -67,17 +68,26 @@ class SurveyFacade(
             .let { ResearcherSurveysDto(it) }
 
     private fun surveysDtoForParticipant(participantId: ParticipantId): ParticipantSurveysDto {
-        val participationInProgress = surveyParticipationService.findParticipationInProgress(participantId)
-        val surveyInProgress = participationInProgress?.let { surveyService.findSurvey(it.surveyId) }
+        val participations = surveyParticipationService.findParticipationsByParticipantId(participantId)
+        val surveyInProgress = participations.find { it.status == IN_PROGRESS }
+                ?.let { surveyService.findSurvey(it.surveyId) }
         val eligibleSurveys = surveyService.findEligibleSurveys(participantId)
             .filter { it.id.raw != surveyInProgress?.id?.raw }
         return ParticipantSurveysDto(
-            surveyInProgress?.let { toParticipantSurveyDto(it, participationInProgress) },
-            eligibleSurveys.map { toParticipantSurveyDto(it, null) }
+            surveyInProgress?.let { survey -> toParticipantSurveyDto(
+                survey,
+                participations.find { it.status == IN_PROGRESS }
+            ) },
+            eligibleSurveys
+                .filter { survey -> survey.id.raw !in  participations.map { it.surveyId.raw }}
+                .map { toParticipantSurveyDto(it, null) }
         )
     }
 
-    private fun toParticipantSurveyDto(survey: Survey, surveyParticipation: SurveyParticipation?): ParticipantSurveyDto =
+    private fun toParticipantSurveyDto(
+        survey: Survey,
+        surveyParticipation: SurveyParticipation?
+    ): ParticipantSurveyDto =
         ParticipantSurveyDto(
             surveyId = survey.id.raw,
             participationId = surveyParticipation?.id?.raw,

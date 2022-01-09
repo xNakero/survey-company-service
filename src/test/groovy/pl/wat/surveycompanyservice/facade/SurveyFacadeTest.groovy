@@ -8,6 +8,7 @@ import pl.wat.surveycompanyservice.domain.role.AppRole
 import pl.wat.surveycompanyservice.domain.survey.NoEligibleParticipantsException
 import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.domain.survey.SurveysWithTypeDto
+import pl.wat.surveycompanyservice.domain.surveyparticipation.ParticipationStatus
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.UserId
@@ -133,4 +134,22 @@ class SurveyFacadeTest extends BaseUnitTest {
             dto.surveys.activeSurveys.first().surveyId == SURVEY_ID
     }
 
+    def 'should return only surveys for participant that do not have any participation for that user'() {
+        given:
+            Survey survey1 = survey()
+            survey1.eligibleParticipantsIds.add(PARTICIPANT_ID)
+            inMemorySurveyRepository.saveSurvey(survey1)
+        and:
+            Survey survey2 = survey([surveyId: '123'])
+            survey2.eligibleParticipantsIds.add(PARTICIPANT_ID)
+            SurveyParticipation surveyParticipation1 = surveyParticipation([surveyId: '123', status: ParticipationStatus.TIMEOUT])
+            inMemorySurveyRepository.saveSurvey(survey2)
+            inMemorySurveyParticipationRepository.insert(surveyParticipation1)
+        when:
+            SurveysWithTypeDto dto = surveyFacade.getSurveys(new UserId(PARTICIPANT_ID), 'PARTICIPANT')
+        then:
+            dto.surveys.surveyInProgress == null
+            dto.surveys.availableSurveys.size() == 1
+            dto.surveys.availableSurveys.first().surveyId == SURVEY_ID
+    }
 }
