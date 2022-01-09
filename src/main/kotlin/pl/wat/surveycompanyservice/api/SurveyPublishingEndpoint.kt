@@ -53,7 +53,8 @@ data class SurveyParamsDto(
     @field:Max(value = 10800, message = "Maximum time to complete has to be no longer than 3 hours.")
     val timeToCompleteInSeconds: Int,
     @field:Length(min = 100, max = 2000, message = "Description has to be between 100 and 2000 characters.") val description: String,
-    @field:Min(value = 1, message = "There is at least one spot required for a survey.") val spots: Int
+    @field:Min(value = 1, message = "There is at least one spot required for a survey.") val spots: Int,
+    @field:Length(max = 32, message = "Completion code has to be maximum 32 characters") val completionCode: String
 )
 
 data class EligibleUsersDto(

@@ -6,9 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileFacade
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileService
 import pl.wat.surveycompanyservice.domain.role.RoleRepository
-import pl.wat.surveycompanyservice.domain.survey.CompletionCodeFactory
 import pl.wat.surveycompanyservice.domain.survey.SurveyFacade
-import pl.wat.surveycompanyservice.domain.survey.SurveyProperties
 import pl.wat.surveycompanyservice.domain.survey.SurveyService
 import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryEntryFacade
 import pl.wat.surveycompanyservice.domain.surveyhistory.HistoryEntryService
@@ -52,18 +50,16 @@ class BaseUnitTest extends Specification{
     protected PersonalProfileFacade personalProfileFacade = new PersonalProfileFacade(personalProfileService)
     protected UserFacade userFacade = new UserFacade(userService, tokenService, personalProfileFacade)
     protected SurveyService surveyService = new SurveyService(inMemorySurveyRepository)
-    protected CompletionCodeFactory completionCodeFactory = new CompletionCodeFactory()
-    protected SurveyProperties surveyProperties = new SurveyProperties()
+
     protected SurveyParticipationIdFactory surveyParticipationIdFactory = new SurveyParticipationIdFactory()
     protected SurveyParticipationService surveyParticipationService = new SurveyParticipationService(
             inMemorySurveyParticipationRepository,
             surveyParticipationIdFactory,
             clock
     )
-    protected SurveyFacade surveyFacade = new SurveyFacade(surveyService,
+    protected SurveyFacade surveyFacade = new SurveyFacade(
+            surveyService,
             personalProfileService,
-            completionCodeFactory,
-            surveyProperties,
             surveyParticipationService,
             clock
     )

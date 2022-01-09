@@ -47,7 +47,8 @@ class SurveyParticipationService(
     }
 
     fun hasNoOtherParticipation(participantId: ParticipantId): Boolean =
-        surveyParticipationRepository.findByParticipantId(participantId).isEmpty()
+        surveyParticipationRepository.findByParticipantId(participantId)
+            .none { it.status == IN_PROGRESS }
 
     fun findInProgress(surveyIds: List<SurveyId>): List<SurveyParticipation> =
         surveyParticipationRepository.findInProgressBySurveyIds(surveyIds)
@@ -63,6 +64,9 @@ class SurveyParticipationService(
 
     fun findParticipationInProgress(participantId: ParticipantId): SurveyParticipation? =
         surveyParticipationRepository.findInProgressByParticipantId(participantId)
+
+    fun findParticipationsByParticipantId(participantId: ParticipantId): List<SurveyParticipation> =
+        surveyParticipationRepository.findByParticipantId(participantId)
 
     fun findNotInProgress(participantId: ParticipantId): Map<SurveyId, SurveyParticipation> =
         surveyParticipationRepository.findNotInProgress(participantId)
