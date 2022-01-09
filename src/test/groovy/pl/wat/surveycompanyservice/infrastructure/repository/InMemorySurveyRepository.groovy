@@ -3,12 +3,15 @@ package pl.wat.surveycompanyservice.infrastructure.repository
 import org.jetbrains.annotations.NotNull
 import pl.wat.surveycompanyservice.domain.survey.Survey
 import pl.wat.surveycompanyservice.domain.survey.SurveyRepository
+import pl.wat.surveycompanyservice.domain.survey.SurveyStatus
 import pl.wat.surveycompanyservice.shared.ParticipantId
 import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 
 import java.util.concurrent.CopyOnWriteArraySet
+
+import static pl.wat.surveycompanyservice.domain.survey.SurveyStatus.SCHEDULED_TO_FINISH
 
 class InMemorySurveyRepository implements SurveyRepository {
 
@@ -63,7 +66,7 @@ class InMemorySurveyRepository implements SurveyRepository {
 
     @Override
     List<Survey> findBySurveyIds(@NotNull List<SurveyId> surveyIds) {
-        return surveys.findAll { surveyIds.raw.contains(it.id.raw)}.toList()
+        return surveys.findAll { surveyIds.raw.contains(it.id.raw) }.toList()
     }
 
     @Override
@@ -78,13 +81,34 @@ class InMemorySurveyRepository implements SurveyRepository {
     }
 
     @Override
-    List<Survey> findAllByResearcherId(@NotNull ResearcherId researcherId) {
+    List<Survey> findAllActiveByResearcherId(@NotNull ResearcherId researcherId) {
         return surveys.findAll { it.researcherId.raw == researcherId.raw }.toList()
     }
 
     @Override
     List<Survey> findEligibleToParticipate(@NotNull ParticipantId participantId) {
         return surveys.findAll { it.eligibleParticipantsIds.contains(participantId.raw) }.toList()
+    }
+
+    @Override
+    void scheduleToFinish(@NotNull SurveyId surveyId, @NotNull ResearcherId researcherId) {
+        Survey survey = surveys.find { it.id.raw == surveyId.raw }
+        Survey updatedSurvey = new Survey(
+                survey.id,
+                survey.researcherId,
+                survey.participationIds,
+                survey.participationIds,
+                survey.title,
+                survey.url,
+                survey.timeToCompleteInSeconds,
+                survey.description,
+                survey.spotsTotal,
+                survey.spotsTaken,
+                survey.completionCode,
+                SCHEDULED_TO_FINISH,
+                survey.startedAt
+        )
+        saveSurvey(updatedSurvey)
     }
 
     void clear() {

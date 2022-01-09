@@ -6,6 +6,7 @@ import pl.wat.surveycompanyservice.domain.profile.PersonalProfileQueryParams
 import pl.wat.surveycompanyservice.domain.profile.PersonalProfileService
 import pl.wat.surveycompanyservice.domain.role.AppRole.PARTICIPANT
 import pl.wat.surveycompanyservice.domain.role.AppRole.RESEARCHER
+import pl.wat.surveycompanyservice.domain.survey.SurveyStatus.ACTIVE
 import pl.wat.surveycompanyservice.domain.surveyhistory.format
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipationService
@@ -51,6 +52,10 @@ class SurveyFacade(
             role,
             getSurveysForRole(userId, role)
         )
+
+    fun finishSurvey(surveyId: SurveyId, researcherId: ResearcherId) {
+        surveyService.finishSurvey(surveyId, researcherId)
+    }
 
     private fun getSurveysForRole(userId: UserId, role: String): SurveysDto =
         when (role) {
@@ -108,7 +113,7 @@ fun SurveyToPostDto.toSurvey(
     spotsTotal = determineTotalSpots(surveyParams.spots, eligibleParticipantsIds),
     spotsTaken = 0,
     completionCode = completionCode,
-    status = SurveyStatus.ACTIVE,
+    status = ACTIVE,
     startedAt = timestamp
 )
 

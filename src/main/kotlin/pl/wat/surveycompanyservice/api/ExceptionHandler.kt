@@ -25,6 +25,7 @@ import pl.wat.surveycompanyservice.domain.surveyparticipation.WrongParticipantEx
 import pl.wat.surveycompanyservice.domain.user.RoleNotFoundException
 import pl.wat.surveycompanyservice.domain.user.UserAlreadyExistsException
 import pl.wat.surveycompanyservice.infrastructure.repository.IndexingErrorException
+import pl.wat.surveycompanyservice.infrastructure.repository.NoSurveyForResearcherException
 import pl.wat.surveycompanyservice.infrastructure.repository.UpdatingErrorException
 
 @RestControllerAdvice
@@ -180,6 +181,15 @@ class ExceptionHandler {
         AppException(
             httpStatus = BAD_REQUEST,
             statusCode = BAD_REQUEST.value(),
+            errors = listOf(exception.message)
+        )
+
+    @ExceptionHandler(NoSurveyForResearcherException::class)
+    @ResponseStatus(FORBIDDEN)
+    fun noSurveyForResearcherExceptionHandler(exception: NoSurveyForResearcherException) =
+        AppException(
+            httpStatus = FORBIDDEN,
+            statusCode = FORBIDDEN.value(),
             errors = listOf(exception.message)
         )
 }

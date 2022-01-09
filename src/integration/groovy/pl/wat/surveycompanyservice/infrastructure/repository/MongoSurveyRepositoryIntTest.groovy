@@ -15,6 +15,7 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.RESEARCHER_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_PARTICIPATION_ID
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
+import static pl.wat.surveycompanyservice.domain.survey.SurveyStatus.SCHEDULED_TO_FINISH
 
 class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
 
@@ -85,14 +86,19 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
                     surveyId: '123',
                     startedAt: clock.instant().minus(7, DAYS).toString()
             ]).toMongoSurvey()
+            MongoSurvey scheduledSurvey = survey([
+                    surveyId: '456',
+                    status: SCHEDULED_TO_FINISH.toString()
+            ]).toMongoSurvey()
         and:
             mongoOperations.save(notEligibleSurvey)
             mongoOperations.save(eligibleSurvey)
+            mongoOperations.save(scheduledSurvey)
         when:
             List result = mongoSurveyRepository.findSurveysEligibleToFinish()
         then:
-            result.size() == 1
-            result.first().id.raw == '123'
+            result.size() == 2
+            result.id.raw.containsAll('123', '456')
     }
 
     def 'should find surveys by ids'() {
@@ -121,7 +127,7 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
             mongoOperations.findAll(MongoSurvey.class).size() == 0
     }
 
-    def 'should return surveys by researcherId'() {
+    def 'should return active surveys by researcherId'() {
         given:
             MongoSurvey survey1 = survey().toMongoSurvey()
             MongoSurvey survey2 = survey([surveyId: '123']).toMongoSurvey()
@@ -129,12 +135,17 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
                     surveyId: '456',
                     researcherId: '12345'
             ]).toMongoSurvey()
+            MongoSurvey survey4 = survey([
+                    surveyId: '789',
+                    status: SCHEDULED_TO_FINISH.toString()
+            ]).toMongoSurvey()
         and:
             mongoOperations.save(survey1)
             mongoOperations.save(survey2)
             mongoOperations.save(survey3)
+            mongoOperations.save(survey4)
         when:
-            List result = mongoSurveyRepository.findAllByResearcherId(new ResearcherId(RESEARCHER_ID))
+            List result = mongoSurveyRepository.findAllActiveByResearcherId(new ResearcherId(RESEARCHER_ID))
         then:
             result.size() == 2
             result.id.raw.containsAll([SURVEY_ID, '123'])
@@ -155,5 +166,15 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
         then:
             result.size() == 1
             result.first().id.raw == '123'
+    }
+
+    def 'should update survey status'() {
+        given:
+            MongoSurvey survey1 = survey().toMongoSurvey()
+            mongoOperations.save(survey1)
+        when:
+            mongoSurveyRepository.scheduleToFinish(new SurveyId(SURVEY_ID), new ResearcherId(RESEARCHER_ID))
+        then:
+            mongoOperations.findAll(MongoSurvey.class).first().status == SCHEDULED_TO_FINISH.toString()
     }
 }

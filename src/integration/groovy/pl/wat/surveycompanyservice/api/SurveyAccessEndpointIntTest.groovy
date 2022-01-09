@@ -3,7 +3,9 @@ package pl.wat.surveycompanyservice.api
 import groovyx.net.http.HttpResponseDecorator
 import pl.wat.surveycompanyservice.BaseIntegrationTest
 import pl.wat.surveycompanyservice.IntegrationTestBuilders
+import pl.wat.surveycompanyservice.domain.survey.MongoSurvey
 import pl.wat.surveycompanyservice.domain.survey.Survey
+import pl.wat.surveycompanyservice.domain.survey.SurveyStatus
 import pl.wat.surveycompanyservice.domain.surveyparticipation.SurveyParticipation
 
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.COMPLETION_CODE
@@ -22,6 +24,9 @@ import static pl.wat.surveycompanyservice.IntegrationTestBuilders.SURVEY_STARTED
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.TITLE
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.survey
 import static pl.wat.surveycompanyservice.IntegrationTestBuilders.surveyParticipation
+import static pl.wat.surveycompanyservice.api.SurveyAction.FINISH
+import static pl.wat.surveycompanyservice.domain.survey.SurveyStatus.ACTIVE
+import static pl.wat.surveycompanyservice.domain.survey.SurveyStatus.SCHEDULED_TO_FINISH
 
 class SurveyAccessEndpointIntTest extends BaseIntegrationTest{
 
@@ -122,5 +127,32 @@ class SurveyAccessEndpointIntTest extends BaseIntegrationTest{
                             ]
                     ]
             ]
+    }
+
+    def 'should finish survey'() {
+        given:
+            authAs(RESEARCHER_USERNAME, PASSWORD)
+            String principalId = getPrincipalId(RESEARCHER_USERNAME).toString()
+        and:
+            mongoOperations.save(survey(researcherId: principalId).toMongoSurvey())
+        when:
+            HttpResponseDecorator response = restClient.put([path: "/surveys/$SURVEY_ID", body: [action: FINISH]]) as HttpResponseDecorator
+        then:
+            response.status == 200
+            mongoOperations.findAll(MongoSurvey.class).first().status == SCHEDULED_TO_FINISH.toString()
+    }
+
+    def 'should return 403 status when researcher tries to finish not his own survey'() {
+        given:
+            authAs(RESEARCHER_USERNAME, PASSWORD)
+            String principalId = getPrincipalId(RESEARCHER_USERNAME).toString()
+        and:
+            mongoOperations.save(survey().toMongoSurvey())
+        when:
+            HttpResponseDecorator response = restClient.put([path: "/surveys/$SURVEY_ID", body: [action: FINISH]]) as HttpResponseDecorator
+        then:
+            response.status == 403
+            response.data.errors.first() == "Researcher with id: $principalId doesn't have a survey with id $SURVEY_ID"
+            mongoOperations.findAll(MongoSurvey.class).first().status == ACTIVE.toString()
     }
 }

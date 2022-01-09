@@ -12,6 +12,7 @@ interface SurveyRepository {
     fun findSurveysEligibleToFinish(): List<Survey>
     fun findBySurveyIds(surveyIds: List<SurveyId>): List<Survey>
     fun removeByIds(surveyIds: List<SurveyId>)
-    fun findAllByResearcherId(researcherId: ResearcherId): List<Survey>
+    fun findAllActiveByResearcherId(researcherId: ResearcherId): List<Survey>
     fun findEligibleToParticipate(participantId: ParticipantId): List<Survey>
+    fun scheduleToFinish(surveyId: SurveyId, researcherId: ResearcherId)
 }
