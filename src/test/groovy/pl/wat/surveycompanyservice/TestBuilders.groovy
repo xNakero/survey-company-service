@@ -121,13 +121,15 @@ class TestBuilders {
         Integer timeToCompleteInSeconds = params.timeToCompleteInSeconds as Integer ?: TIME_TO_COMPLETE_IN_SECONDS
         String description = params.description as String ?: DESCRIPTION
         Integer spots = params.spots as Integer ?: SPOTS
+        String completionCode = params.completionCode as String ?: COMPLETION_CODE
 
         return new SurveyParamsDto(
                 title,
                 url,
                 timeToCompleteInSeconds,
                 description,
-                spots
+                spots,
+                completionCode
         )
     }
 

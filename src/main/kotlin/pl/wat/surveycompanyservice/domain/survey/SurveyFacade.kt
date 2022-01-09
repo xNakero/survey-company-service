@@ -25,16 +25,13 @@ import java.util.*
 class SurveyFacade(
     private val surveyService: SurveyService,
     private val personalProfileService: PersonalProfileService,
-    private val completionCodeFactory: CompletionCodeFactory,
-    private val surveyProperties: SurveyProperties,
     private val surveyParticipationService: SurveyParticipationService,
     private val clock: Clock
 ) {
     fun saveSurvey(surveyDto: SurveyToPostDto, researcherId: ResearcherId) {
         val eligibleUsers = personalProfileService.findEligibleParticipantIds(surveyDto.queryParams)
             .also { if (it.isEmpty()) throw NoEligibleParticipantsException("There are no eligible participants.") }
-        val completionCode = completionCodeFactory.generateCode(surveyProperties.codeLength)
-        val survey = surveyDto.toSurvey(researcherId, eligibleUsers, completionCode, clock.instant())
+        val survey = surveyDto.toSurvey(researcherId, eligibleUsers, clock.instant())
         surveyService.saveSurvey(survey)
     }
 
@@ -99,7 +96,6 @@ class SurveyFacade(
 fun SurveyToPostDto.toSurvey(
     researcherId: ResearcherId,
     eligibleParticipantsIds: List<String>,
-    completionCode: String,
     timestamp: Instant
 ): Survey = Survey(
     id = SurveyId(UUID.randomUUID().toString()),
@@ -112,7 +108,7 @@ fun SurveyToPostDto.toSurvey(
     description = surveyParams.description,
     spotsTotal = determineTotalSpots(surveyParams.spots, eligibleParticipantsIds),
     spotsTaken = 0,
-    completionCode = completionCode,
+    completionCode = surveyParams.completionCode,
     status = ACTIVE,
     startedAt = timestamp
 )

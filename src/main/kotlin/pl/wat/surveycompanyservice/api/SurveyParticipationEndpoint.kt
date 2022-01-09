@@ -47,7 +47,7 @@ class SurveyParticipationEndpoint(
 
 data class ParticipationModificationDto(
     @field:Enum(enumClass = Action::class, message = "There is no such action.") val action: Action,
-    @field:Length(min = 32, max = 32, message = "Completion code has to have length of 32 characters.") val completionCode: String?
+    val completionCode: String?
 )
 
 enum class Action {
