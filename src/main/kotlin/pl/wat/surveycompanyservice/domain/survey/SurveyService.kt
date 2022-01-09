@@ -7,9 +7,6 @@ import pl.wat.surveycompanyservice.shared.ResearcherId
 import pl.wat.surveycompanyservice.shared.SurveyId
 import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 import java.time.Duration
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.SECONDS
 
 @Service
@@ -42,7 +39,7 @@ class SurveyService(
     }
 
     fun findAllByResearcherId(researcherId: ResearcherId): List<ResearcherSurveyDto> =
-        surveyRepository.findAllByResearcherId(researcherId)
+        surveyRepository.findAllActiveByResearcherId(researcherId)
             .map { it.toResearcherSurveyDto() }
 
     fun findEligibleSurveys(participantId: ParticipantId): List<Survey> =
@@ -60,4 +57,8 @@ class SurveyService(
             completionCode = completionCode,
             startedAt = startedAt
         )
+
+    fun finishSurvey(surveyId: SurveyId, researcherId: ResearcherId) {
+        surveyRepository.scheduleToFinish(surveyId, researcherId)
+    }
 }
