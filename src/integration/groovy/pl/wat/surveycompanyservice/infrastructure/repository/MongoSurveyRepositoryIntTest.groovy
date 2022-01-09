@@ -118,7 +118,7 @@ class MongoSurveyRepositoryIntTest extends BaseIntegrationTest {
         when:
             mongoSurveyRepository.removeByIds([new SurveyId(SURVEY_ID)])
         then:
-            mongoOperations.findAll(MongoSurvey.class).size() == 1
+            mongoOperations.findAll(MongoSurvey.class).size() == 0
     }
 
     def 'should return surveys by researcherId'() {

@@ -50,8 +50,8 @@ data class SurveyParamsDto(
     @field:Length(min = 3, max = 100, message = "Length of title has to be between 3 and 100 characters.") val title: String,
     @field:URL(message = "url field is not a url.") val url: String,
     @field:Min(value = 300, message = "Minimum time to complete has to be at least 5 minutes.")
-    @field:Max(value = 10800, message = "Maximum time to complete has to be no longer than 3 hours.") val
-    timeToCompleteInSeconds: Int,
+    @field:Max(value = 10800, message = "Maximum time to complete has to be no longer than 3 hours.")
+    val timeToCompleteInSeconds: Int,
     @field:Length(min = 100, max = 2000, message = "Description has to be between 100 and 2000 characters.") val description: String,
     @field:Min(value = 1, message = "There is at least one spot required for a survey.") val spots: Int
 )

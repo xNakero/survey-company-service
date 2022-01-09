@@ -8,5 +8,5 @@ import pl.wat.surveycompanyservice.shared.SurveyParticipationId
 @Component
 class SurveyParticipationIdFactory {
     fun generateId(participantId: ParticipantId, surveyId: SurveyId): SurveyParticipationId =
-        SurveyParticipationId("$participantId$surveyId")
+        SurveyParticipationId("${participantId.raw}${surveyId.raw}")
 }

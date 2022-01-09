@@ -1,9 +1,6 @@
 package pl.wat.surveycompanyservice.domain.surveyhistory
 
-import pl.wat.surveycompanyservice.shared.HistoryEntryId
-import java.time.Duration
 import java.time.Instant
-import java.time.LocalTime
 
 data class SurveyHistoryDto(
     val type: String,

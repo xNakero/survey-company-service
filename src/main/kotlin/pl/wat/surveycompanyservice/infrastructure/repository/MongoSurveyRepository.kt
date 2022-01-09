@@ -61,7 +61,7 @@ class MongoSurveyRepository(
     }
 
     override fun removeByIds(surveyIds: List<SurveyId>) {
-        val query = Query.query(Criteria.where(ID).`in`(surveyIds))
+        val query = Query.query(Criteria.where(ID).`in`(surveyIds.map { it.raw }))
         mongoOperations.remove(query, MongoSurvey::class.java)
     }
 
